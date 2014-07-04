@@ -1,11 +1,13 @@
+"""
+Use this program as a template for experimenting with the Metropolis algorithm
+applied to a single parameter called theta, defined on the interval [0,1].
+"""
 from __future__ import division
 import numpy as np
 from scipy.stats import beta
 from plot_post import *
 
-# Use this program as a template for experimenting with the Metropolis
-# algorithm applied to a single parameter called theta, defined on the 
-# interval [0,1].
+
 
 # Specify the data, to be used in the likelihood function.
 # This is a vector with one component per flip,
