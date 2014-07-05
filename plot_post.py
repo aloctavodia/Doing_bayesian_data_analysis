@@ -30,7 +30,7 @@ def plot_post(param_sample_vec, cred_mass=0.95, comp_val=False,
     plt.title(title, fontsize=fontsize)
 
     idx = (np.abs(bins-comp_val)).argmin() #index of the nearest value to comp_val
-    cvHt = n[idx]
+    cvHt = n[idx-1]
     cenTendHt = 0.9 * cvHt
     ROPEtextHt = 0.55 * cvHt
 #    # Display mean or mode:
