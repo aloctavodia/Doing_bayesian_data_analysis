@@ -66,7 +66,7 @@ def target_rel_prob(theta, data):
 # Specify the length of the trajectory, i.e., the number of jumps to try:
 traj_length = 5000 # arbitrary large number
 # Initialize the vector that will store the results:
-trajectory = np.zeros(traj_length+1)
+trajectory = np.zeros(traj_length)
 # Specify where to start the trajectory:
 trajectory[0] = 0.50 # arbitrary value
 # Specify the burn-in period:
@@ -78,7 +78,7 @@ n_rejected = 0
 np.random.seed(4745)
 
 # Now generate the random walk. The 't' index is time or trial in the walk.
-for t in range(traj_length):
+for t in range(traj_length-1):
     current_position = trajectory[t]
     # Use the proposal distribution to generate a proposed jump.
     # The shape and variance of the proposal distribution can be changed
@@ -106,13 +106,12 @@ for t in range(traj_length):
 
 
 # Extract the post-burn_in portion of the trajectory.
-accepted_traj = trajectory[(burn_in+1):]
+accepted_traj = trajectory[burn_in:]
 # End of Metropolis algorithm.
 
 
 
 # Display rejected/accepted ratio in the plot.
-# Get the highest point and mean of the plot for subsequent text positioning:
 mean_traj = np.mean(accepted_traj)
 std_traj = np.std(accepted_traj)
 plt.plot(0, label=r'$N_{pro}=%s$ $\frac{N_{acc}}{N_{pro}} = %.3f$' % (len(accepted_traj), (n_accepted/len(accepted_traj))), alpha=0)

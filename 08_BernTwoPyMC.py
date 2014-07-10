@@ -1,3 +1,6 @@
+"""
+Inferring two binomial proportions using PyMC.
+"""
 from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np

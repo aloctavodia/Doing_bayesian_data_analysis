@@ -1,3 +1,6 @@
+"""
+Inferring a binomial proportion using PyMC.
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 import pymc as pm
