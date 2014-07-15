@@ -5,18 +5,19 @@ from __future__ import division
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from scipy.stats import beta
+from HDI_of_grid import HDI_of_grid
 import numpy as np
 
 
 # Specify the grid on theta1,theta2 parameter space.
-n_int = 500 # arbitrary number of intervals for grid on theta.
+n_int = 500  # arbitrary number of intervals for grid on theta.
 theta1 = np.linspace(0, 1, n_int)
 theta2 = theta1
 
 theta1_grid, theta2_grid = np.meshgrid(theta1, theta2)
 
 # Specify the prior probability _masses_ on the grid.
-prior_name = ("Beta","Ripples","Null","Alt")[0] # or define your own.
+prior_name = ("Beta","Ripples","Null","Alt")[0]  # or define your own.
 if prior_name == "Beta":
     a1, b1, a2, b2 = 3, 3, 3, 3
     prior1 = beta.pdf(theta1_grid, a1, b1)
@@ -102,9 +103,10 @@ plt.xlabel(r'$\theta1$')
 plt.ylabel(r'$\theta1$')
 plt.plot(0, label='p(D) = %.3e' % p_data, alpha=0)
 plt.legend(loc='upper left')
-# Mark the highest posterior density region
-# TODO 
 
+# Mark the highest posterior density region
+HDI_height = HDI_of_grid(posterior)['height']
+plt.contour(theta1_grid, theta2_grid, posterior, levels=[HDI_height], colors='k')
 
 plt.tight_layout()
 plt.savefig('BernTwoGrid_%s.png' % prior_name)
