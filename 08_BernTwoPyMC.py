@@ -24,7 +24,9 @@ with pm.Model() as model:
     start = pm.find_MAP()  # Find starting value by optimization
     trace = pm.sample(10000, pm.Metropolis(),
                       progressbar=False)  # Use Metropolis sampling
-#    trace = pm.sample(10000, pm.NUTS(), progressbar=False) # Use NUTS sampling
+#    start = pm.find_MAP()  # Find starting value by optimization
+#    step = pm.NUTS(scaling=start)  # Instantiate NUTS sampler
+#    trace = pm.sample(10000, step, start=start, progressbar=False)
 
 # create an array with the posterior sample
 theta1_sample = trace['theta1']

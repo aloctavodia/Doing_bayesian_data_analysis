@@ -17,10 +17,13 @@ with pm.Model() as model:
     y = pm.Bernoulli('y', p=theta, observed=y)
 
     # Generate a MCMC chain
-    start = pm.find_MAP()  # Find starting value by optimization
     trace = pm.sample(5000, pm.Metropolis(),
                       progressbar=False)  # Use Metropolis sampling
-# trace = pm.sample(5000, pm.NUTS(), progressbar=False) # Use NUTS sampling
+#    start = pm.find_MAP()  # Find starting value by optimization
+#    step = pm.NUTS(scaling=start)  # Instantiate NUTS sampler
+#    trace = pm.sample(5000, step, start=start, progressbar=False)
+
+
 
 # create an array with the posterior sample
 theta_sample = trace['theta']
