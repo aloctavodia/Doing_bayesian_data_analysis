@@ -20,13 +20,13 @@ with pm.Model() as model:
     trace = pm.sample(5000, pm.Metropolis(),
                       progressbar=False)  # Use Metropolis sampling
 #    start = pm.find_MAP()  # Find starting value by optimization
-#    step = pm.NUTS(scaling=start)  # Instantiate NUTS sampler
+#    step = pm.NUTS(state=start)  # Instantiate NUTS sampler
 #    trace = pm.sample(5000, step, start=start, progressbar=False)
-
-
 
 # create an array with the posterior sample
 theta_sample = trace['theta']
+
+print theta_sample
 
 plt.subplot(1, 2, 1)
 plt.plot(theta_sample[:500], np.arange(500), marker='o')
