@@ -6,8 +6,9 @@ from hpd import hpd
 
 
 def plot_post(param_sample_vec, cred_mass=0.95, comp_val=False,
-              ROPE=False, ylab='', xlab='parameter', fontsize=14, title='',
-              facecolor='skyblue', edgecolor='white', show_mode=True, bins=50):
+              ROPE=False, ylab='', xlab='parameter', fontsize=14, labelsize=14,
+              title='', framealpha=1, facecolor='skyblue', edgecolor='white',
+              show_mode=True, bins=50):
 
     #compute HDI
     HDI = hpd(param_sample_vec, 1-cred_mass)
@@ -63,6 +64,6 @@ def plot_post(param_sample_vec, cred_mass=0.95, comp_val=False,
         post_summary['pc_in_ROPE'] = pc_in_ROPE
 #    # Display the HDI.
     plt.plot(HDI, [0, 0], linewidth=6, color='k', label='HDI %.1f%% %.3f-%.3f' % (cred_mass*100, HDI[0], HDI[1]))
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper left', fontsize=labelsize, framealpha=framealpha)
     return post_summary
 
