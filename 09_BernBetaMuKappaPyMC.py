@@ -9,12 +9,10 @@ from scipy.stats import beta, gamma
 import matplotlib.pyplot as plt
 from plot_post import plot_post
 
-np.random.seed(123)
 
 # Data for figure 9.11
 N =  [10, 10, 10]  # Number of flips per coin
 z =  [5, 5, 5]  # Number of heads per coin
-
 ## Data for figure 9.12
 #N =  [10, 10, 10]  # Number of flips per coin
 #z =  [1, 5, 9]  # Number of heads per coin
@@ -30,22 +28,26 @@ for i, flips in enumerate(N):
         y = y + [1] * heads + [0] * (flips-heads)
         coin = coin + [i] * flips
 
+
 # Specify the model in PyMC
 with pm.Model() as model:
 # define the hyperparameters
     mu = pm.Beta('mu', 2, 2)
     kappa = pm.Gamma('kappa', 1, 0.1)
     # define the prior
-    theta = pm.Beta('theta', mu * kappa, (1 - mu) * kappa, shape=3)
+    theta = pm.Beta('theta', mu * kappa, (1 - mu) * kappa, shape=len(N))
     # define the likelihood
     y = pm.Bernoulli('y', p=theta[coin], observed=y)
 
     # Generate a MCMC chain
-    trace = pm.sample(10000, pm.Metropolis(),
-                      progressbar=False)  # Use Metropolis sampling
+    step1 = pm.Metropolis([mu, theta])
+    step2 = pm.NUTS([kappa])
+    trace = pm.sample(5000, [step1, step2], progressbar=False)
+#    trace = pm.sample(10000, pm.Metropolis(),
+#                      progressbar=False, random_seed=123)  # Use Metropolis sampling
 #    start = pm.find_MAP()  # Find starting value by optimization
 #    step = pm.NUTS(state=start)  # Instantiate NUTS sampler
-#    trace = pm.sample(20000, step, start=start, progressbar=False)
+#    trace = pm.sample(5000, step, start=start, progressbar=False)
 
 ## Check the results.
 
@@ -53,31 +55,33 @@ with pm.Model() as model:
 #pm.summary(trace)
 
 ## Check for mixing and autocorrelation:
-# TODO
+pm.autocorrplot(trace, vars =[mu, kappa])
 
 ## Plot KDE and sampled values for each parameter.
 pm.traceplot(trace)
 
-
 # Create arrays with the posterior sample
-burnin = 0  # posterior samples to discard
-theta1_sample = trace['theta'][:,0][burnin:]
-theta2_sample = trace['theta'][:,1][burnin:]
-theta3_sample = trace['theta'][:,2][burnin:]
-mu_sample = trace['mu'][burnin:]
-kappa_sample = trace['kappa'][burnin:]
+burnin = 2000  # posterior samples to discard
+thin = 10
+theta1_sample = trace['theta'][:,0][burnin::thin]
+theta2_sample = trace['theta'][:,1][burnin::thin]
+theta3_sample = trace['theta'][:,2][burnin::thin]
+mu_sample = trace['mu'][burnin::thin]
+kappa_sample = trace['kappa'][burnin::thin]
 
 fig = plt.figure(figsize=(12,12))
 
 # Scatter plot hyper-parameters
 plt.subplot(4, 3, 1)
 plt.scatter(mu_sample, kappa_sample, marker='o')
+plt.xlim(0,1)
 plt.xlabel(r'$\mu$')
 plt.ylabel(r'$\kappa$')
 
 # Plot mu histogram
 plt.subplot(4, 3, 2)
 plot_post(mu_sample, xlab=r'$\mu$', show_mode=False, labelsize=9, framealpha=0.5)
+plt.xlim(0,1)
 
 # Plot kappa histogram
 plt.subplot(4, 3, 3)
@@ -91,12 +95,15 @@ plt.xlim(0,1)
 # Scatter theta 1 vs mu
 plt.subplot(4, 3, 5)
 plt.scatter(theta1_sample, mu_sample, marker='o')
+plt.xlim(0,1)
+plt.ylim(0,1)
 plt.xlabel(r'$\theta1$')
 plt.ylabel(r'$\mu$')
 
 # Scatter theta 1 vs kappa
 plt.subplot(4, 3, 6)
 plt.scatter(theta1_sample, kappa_sample, marker='o')
+plt.xlim(0,1)
 plt.xlabel(r'$\theta1$')
 plt.ylabel(r'$\kappa$')
 
@@ -108,12 +115,15 @@ plt.xlim(0,1)
 # Scatter theta 2 vs mu
 plt.subplot(4, 3, 8)
 plt.scatter(theta2_sample, mu_sample, marker='o')
+plt.xlim(0,1)
+plt.ylim(0,1)
 plt.xlabel(r'$\theta2$')
 plt.ylabel(r'$\mu$')
 
 # Scatter theta 2 vs kappa
 plt.subplot(4, 3, 9)
 plt.scatter(theta2_sample, kappa_sample, marker='o')
+plt.xlim(0,1)
 plt.xlabel(r'$\theta2$')
 plt.ylabel(r'$\kappa$')
 
@@ -125,12 +135,15 @@ plt.xlim(0,1)
 # Scatter theta 3 vs mu
 plt.subplot(4, 3, 11)
 plt.scatter(theta3_sample, mu_sample, marker='o')
+plt.xlim(0,1)
+plt.ylim(0,1)
 plt.xlabel(r'$\theta3$')
 plt.ylabel(r'$\mu$')
 
 # Scatter theta 3 vs kappa
 plt.subplot(4, 3, 12)
 plt.scatter(theta3_sample, kappa_sample, marker='o')
+plt.xlim(0,1)
 plt.xlabel(r'$\theta3$')
 plt.ylabel(r'$\kappa$')
 
