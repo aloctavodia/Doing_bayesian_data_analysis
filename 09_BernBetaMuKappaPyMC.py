@@ -39,15 +39,21 @@ with pm.Model() as model:
     # define the likelihood
     y = pm.Bernoulli('y', p=theta[coin], observed=y)
 
-    # Generate a MCMC chain
-    step1 = pm.Metropolis([mu, theta])
+#   Generate a MCMC chain
+    step = pm.Metropolis()
+    trace = pm.sample(5000, step, progressbar=False)
+#   Restricted models like this could be difficult to sample. This is related 
+#   to the censoring comment in the book. One way to detect that something is 
+#   wrong with the sampling is to compare the autocorrelation plot and the 
+#   sampled values under different sampler, or you can try combinations of 
+#   sampler like this
+#    step1 = pm.Metropolis([theta, mu])
+#    step2 = pm.Slice([kappa])
+#    trace = pm.sample(5000, [step1, step2], progressbar=False)
+#    or this (this combination was used to generate the figures)
+    step1 = pm.Metropolis([theta, mu])
     step2 = pm.NUTS([kappa])
     trace = pm.sample(5000, [step1, step2], progressbar=False)
-#    trace = pm.sample(10000, pm.Metropolis(),
-#                      progressbar=False, random_seed=123)  # Use Metropolis sampling
-#    start = pm.find_MAP()  # Find starting value by optimization
-#    step = pm.NUTS(state=start)  # Instantiate NUTS sampler
-#    trace = pm.sample(5000, step, start=start, progressbar=False)
 
 ## Check the results.
 
@@ -62,7 +68,7 @@ pm.traceplot(trace)
 
 # Create arrays with the posterior sample
 burnin = 2000  # posterior samples to discard
-thin = 10
+thin = 10  # posterior samples to discard
 theta1_sample = trace['theta'][:,0][burnin::thin]
 theta2_sample = trace['theta'][:,1][burnin::thin]
 theta3_sample = trace['theta'][:,2][burnin::thin]
