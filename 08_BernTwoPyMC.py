@@ -25,7 +25,7 @@ with pm.Model() as model:
     trace = pm.sample(10000, pm.Metropolis(),
                       progressbar=False)  # Use Metropolis sampling
 #    start = pm.find_MAP()  # Find starting value by optimization
-#    step = pm.NUTS(state=start)  # Instantiate NUTS sampler
+#    step = pm.NUTS()  # Instantiate NUTS sampler
 #    trace = pm.sample(10000, step, start=start, progressbar=False)
 
 # create an array with the posterior sample
