@@ -30,10 +30,9 @@ def plot_post(param_sample_vec, cred_mass=0.95, comp_val=False,
     plt.ylabel(ylab, fontsize=fontsize)
     plt.title(title, fontsize=fontsize)
 
-    idx = (np.abs(bins-comp_val)).argmin() #index of the nearest value to comp_val
-    cvHt = n[idx-1]
-    cenTendHt = 0.9 * cvHt
-    ROPEtextHt = 0.55 * cvHt
+    cv_ht = 0.75*np.max(n)
+    cen_tend_ht = 0.9 * cv_ht
+    ROPE_text_ht = 0.55 * cv_ht
 #    # Display mean or mode:
     if show_mode:
         plt.plot(0, label='mode = %.2f' % post_summary['mode'], alpha=0)
@@ -44,7 +43,7 @@ def plot_post(param_sample_vec, cred_mass=0.95, comp_val=False,
     if comp_val is not False:
         pc_gt_comp_val = 100 * np.sum(param_sample_vec > comp_val)/len(param_sample_vec)
         pc_lt_comp_val = 100 - pc_gt_comp_val
-        plt.plot([comp_val, comp_val], [0, cvHt], color='darkgreen',
+        plt.plot([comp_val, comp_val], [0, cv_ht], color='darkgreen',
                  linestyle='--', linewidth=2,
                  label='%.1f%% <%.1f < %.1f%%'
                  % (pc_lt_comp_val, comp_val, pc_gt_comp_val))
@@ -54,10 +53,10 @@ def plot_post(param_sample_vec, cred_mass=0.95, comp_val=False,
     if ROPE is not False:
         rope_col = 'darkred'
         pc_in_ROPE = round(np.sum((param_sample_vec > ROPE[0]) & (param_sample_vec < ROPE[1]))/len(param_sample_vec)*100)
-        plt.plot([ROPE[0], ROPE[0]], [0, 0.96*ROPEtextHt], color=rope_col,
+        plt.plot([ROPE[0], ROPE[0]], [0, 0.96*ROPE_text_ht], color=rope_col,
                 linestyle=':', linewidth=4,
                 label='%.1f%% in ROPE' % pc_in_ROPE)
-        plt.plot([ROPE[1], ROPE[1]], [0, 0.96*ROPEtextHt], color=rope_col,
+        plt.plot([ROPE[1], ROPE[1]], [0, 0.96*ROPE_text_ht], color=rope_col,
                 linestyle=':', linewidth=4)
         post_summary['ROPE_low'] = ROPE[0] 
         post_summary['ROPE_high'] = ROPE[1] 
