@@ -38,7 +38,6 @@ for condition in range(0, ncond):
         theta = pm.Beta('theta', mu * kappa, (1 - mu) * kappa, shape=len(z_cond))
         # define the likelihood
         y = pm.Binomial('y', p=theta, n=trials, observed=z_cond)
-        #y = pm.Bernoulli('y', p=theta[cond], observed=y)
     # Generate a MCMC chain
         start = pm.find_MAP()
         step1 = pm.Metropolis([theta, mu])
