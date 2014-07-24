@@ -1,11 +1,9 @@
 """
 More Hierarchical models. The filtration-condensation experiment.
 """
-from __future__ import division
 import numpy as np
 import pymc as pm
 import sys
-from scipy.stats import beta,  gamma
 import matplotlib.pyplot as plt
 from plot_post import plot_post
 
@@ -47,14 +45,30 @@ for condition in range(0, ncond):
         start = pm.find_MAP()
         step1 = pm.Metropolis([theta, mu])
         step2 = pm.NUTS([kappa])
-        trace = pm.sample(5000, [step1, step2], start=start, progressbar=False)
+        trace = pm.sample(10000, [step1, step2], start=start, progressbar=False)
     trace_per_condition.append(trace)
 
+## Check the results.
+burnin = 2000  # posterior samples to discard
+thin = 10  # posterior samples to discard
 
-mu1_sample = trace_per_condition[0]['mu']
-mu2_sample = trace_per_condition[1]['mu']
-mu3_sample = trace_per_condition[2]['mu']
-mu4_sample = trace_per_condition[3]['mu']
+## Print summary for each trace
+#pm.summary(trace[burnin::thin])
+#pm.summary(trace)
+
+## Check for mixing and autocorrelation
+pm.autocorrplot(trace[burnin::thin], vars =[mu, kappa])
+#pm.autocorrplot(trace, vars =[mu, kappa])
+
+## Plot KDE and sampled values for each parameter.
+pm.traceplot(trace[burnin::thin])
+#pm.traceplot(trace)
+
+# Create arrays with the posterior sample
+mu1_sample = trace_per_condition[0]['mu'][burnin::thin]
+mu2_sample = trace_per_condition[1]['mu'][burnin::thin]
+mu3_sample = trace_per_condition[2]['mu'][burnin::thin]
+mu4_sample = trace_per_condition[3]['mu'][burnin::thin]
 
 
 fig = plt.figure(figsize=(15, 6))
@@ -75,3 +89,4 @@ plot_post(a, xlab=r'$(\mu1+\mu2)/2 - (\mu3+\mu4)/2$', show_mode=False, comp_val=
 plt.tight_layout()
 plt.savefig('Figure_9.16.png')
 plt.show()
+

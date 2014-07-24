@@ -1,11 +1,9 @@
 """
 Bernoulli Likelihood with Hierarchical Prior. The Therapeutic Touch example.
 """
-from __future__ import division
 import numpy as np
 import pymc as pm
 import sys
-from scipy.stats import beta, gamma
 import matplotlib.pyplot as plt
 from plot_post import plot_post
 
@@ -42,19 +40,22 @@ with pm.Model() as model:
     trace = pm.sample(10000, [step1, step2], start=start, random_seed=(123), progressbar=False)
 
 ## Check the results.
+burnin = 2000  # posterior samples to discard
+thin = 10  # posterior samples to discard
 
 ## Print summary for each trace
+#pm.summary(trace[burnin::thin])
 #pm.summary(trace)
 
-## Check for mixing and autocorrelation:
-pm.autocorrplot(trace, vars =[mu, kappa])
+## Check for mixing and autocorrelation
+pm.autocorrplot(trace[burnin::thin], vars =[mu, kappa])
+#pm.autocorrplot(trace, vars =[mu, kappa])
 
 ## Plot KDE and sampled values for each parameter.
+pm.traceplot(trace[burnin::thin])
 #pm.traceplot(trace)
 
 # Create arrays with the posterior sample
-burnin = 2000  # posterior samples to discard
-thin = 10  # posterior samples to discard
 theta1_sample = trace['theta'][:,0][burnin::thin]
 theta28_sample = trace['theta'][:,27][burnin::thin]
 mu_sample = trace['mu'][burnin::thin]
