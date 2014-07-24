@@ -30,8 +30,6 @@ z = np.array([45, 63, 58, 64, 58, 63, 51, 60, 59, 47, 63, 61, 60, 51, 59, 45,
 trace_per_condition = []
 for condition in range(0, ncond):
     z_cond = z[condition]
-    N_cond = N[condition]
-
     with pm.Model() as model:
     # define the hyperparameters
         mu = pm.Beta('mu', 1, 1)
