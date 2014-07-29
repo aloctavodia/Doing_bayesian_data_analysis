@@ -49,21 +49,24 @@ with pm.Model() as model:
     y = pm.Bernoulli('y', p=theta[coin], observed=y)
 
 #   Generate a MCMC chain
-#    step = pm.Metropolis()
-#    trace = pm.sample(5000, step, progressbar=False)
+    step = pm.Metropolis()
+    trace = pm.sample(5000, step, progressbar=False)
 #   Restricted models like this could be difficult to sample. This is related 
 #   to the censoring comment in the book. One way to detect that something is 
 #   wrong with the sampling is to compare the autocorrelation plot and the 
 #   sampled values under different sampler, or you can try combinations of 
 #   sampler like this
+
 #    step1 = pm.Metropolis([theta, mu])
 #    step2 = pm.Slice([kappa])
 #    trace = pm.sample(5000, [step1, step2], progressbar=False)
+
 #    or this (this combination was used to generate the figures)
-    start = pm.find_MAP()
-    step1 = pm.Metropolis([theta, mu])
-    step2 = pm.NUTS([kappa])
-    trace = pm.sample(5000, [step1, step2], start=start, progressbar=False)
+
+#    start = pm.find_MAP()
+#    step1 = pm.Metropolis([theta, mu])
+#    step2 = pm.NUTS([kappa])
+#    trace = pm.sample(5000, [step1, step2], start=start, progressbar=False)
 
 ## Check the results.
 burnin = 2000  # posterior samples to discard
