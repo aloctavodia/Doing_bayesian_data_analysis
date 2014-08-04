@@ -1,5 +1,6 @@
 """
-More Hierarchical models. The filtration-condensation experiment.
+More Hierarchical models. The filtration-condensation experiment. A single kappa
+for all conditions.
 """
 import numpy as np
 import pymc as pm
@@ -29,9 +30,12 @@ condition = np.repeat([0,1,2,3], nSubj)
 
 # Specify the model in PyMC
 with pm.Model() as model:
-    kappa = pm.Gamma('kappa', 1, 0.1, shape=ncond)
+    # define the hyperparameters
+    kappa = pm.Gamma('kappa', 1, 0.1)
     mu = pm.Beta('mu', 1, 1, shape=ncond)
-    theta = pm.Beta('theta', mu[condition] * kappa[condition], (1 - mu[condition]) * kappa[condition], shape=len(z))
+    # define the prior
+    theta = pm.Beta('theta', mu[condition] * kappa, (1 - mu[condition]) * kappa, shape=len(z))
+    # define the likelihood
     y = pm.Binomial('y', p=theta, n=N, observed=z)
     start = pm.find_MAP()
     step1 = pm.Metropolis([mu])
@@ -79,5 +83,5 @@ a = (mu1_sample+mu2_sample)/2 - (mu3_sample+mu4_sample)/2
 plot_post(a, xlab=r'$(\mu1+\mu2)/2 - (\mu3+\mu4)/2$', show_mode=False, comp_val=0, framealpha=0.5)
 
 plt.tight_layout()
-plt.savefig('Figure_9.16.png')
+plt.savefig('Figure_9.18_upper.png')
 plt.show()
