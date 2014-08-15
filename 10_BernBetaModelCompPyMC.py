@@ -12,13 +12,13 @@ y = np.repeat([0, 1], [3, 6])  # 3 tails 6 heads
 
 with pm.Model() as model:
     # Hyperhyperprior:
-    model_index = pm.Uniform('model_index', lower=0, upper=1)
+    model_index = pm.DiscreteUniform('model_index', lower=0, upper=1)
     # Hyperprior:
     kappa_theta = 12
-    mu_theta = pm.switch(model_index >= 0.5, 0.25, 0.75)
+    mu_theta = pm.switch(pm.eq(model_index, 1), 0.25, 0.75)
     # Prior distribution:
     a_theta = mu_theta * kappa_theta
-    b_theta = (1-mu_theta) * kappa_theta
+    b_theta = (1 - mu_theta) * kappa_theta
     theta = pm.Beta('theta', a_theta, b_theta) # theta distributed as beta density
     #likelihood
     y = pm.Bernoulli('y', theta, observed=y)
@@ -46,15 +46,16 @@ thin = 1  # posterior samples to discard
 ## Get the posterior sample of model_index:
 model_idx_sample = trace['model_index'][burnin::thin]
 ## Compute the proportion of model_index at each value:
-p_M1 = sum(model_idx_sample >= 0.5) / len(model_idx_sample)
+p_M1 = sum(model_idx_sample == 1) / len(model_idx_sample)
 p_M2 = 1 - p_M1
+
 
 ## Get the posterior sample of theta:
 theta_sample = trace['theta'][burnin::thin]
 ## Extract theta values when model_index is 1:
-theta_sample_M1 = theta_sample[model_idx_sample >= 0.5]
+theta_sample_M1 = theta_sample[model_idx_sample == 1]
 ## Extract theta values when model_index is 2:
-theta_sample_M2 = theta_sample[model_idx_sample < 0.5]
+theta_sample_M2 = theta_sample[model_idx_sample == 0]
 
 ## Plot histograms of sampled theta values for each model,
 plt.figure()
