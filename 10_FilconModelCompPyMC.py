@@ -5,7 +5,6 @@ from __future__ import division
 import numpy as np
 import pymc as pm
 import matplotlib.pyplot as plt
-from plot_post import plot_post
 
 # THE DATA.
 # For each subject, specify the condition s/he was in,
@@ -54,26 +53,22 @@ with pm.Model() as model:
     #Prior on theta
     theta0 = pm.Beta('theta0', a_Beta0, b_Beta0, shape=n_subj)
     theta1 = pm.Beta('theta1', a_Beta1, b_Beta1, shape=n_subj)
+    # if model_index == 0 then sample from theta1 else sample from theta0
     theta = pm.switch(pm.eq(model_index, 0), theta1, theta0)
-    
+
     # Likelihood:
     y = pm.Binomial('y', p=theta, n=n_trl_of_subj, observed=n_corr_of_subj)
 
     # Sampling
     start = pm.find_MAP()
     steps = [pm.Metropolis([i]) for i in model.unobserved_RVs[1:]]
-    #steps.append(pm.NUTS([mu]))
     steps.append(pm.ElemwiseCategoricalStep(var=model_index,values=[0,1]))
-    trace = pm.sample(20000, steps, start=start, progressbar=False)
-
-#    step1 = pm.NUTS(model.unobserved_RVs[1:])
-#    step2 = pm.ElemwiseCategoricalStep(var=model_index, values=[0,1])
-#    trace = pm.sample(10000, step=[step1, step2], start=start, progressbar=False)
+    trace = pm.sample(10000, steps, start=start, progressbar=False)
 
 
 # EXAMINE THE RESULTS.
-burnin = 5000
-thin = 20
+burnin = 10000
+thin = 1
 model_idx_sample = trace['model_index'][burnin::thin]
 
 pM1 = sum(model_idx_sample == 1) / len(model_idx_sample)
@@ -88,19 +83,19 @@ plt.legend(loc='upper right', framealpha=0.75)
 for m in range(0, 2):
     kappa0_sample = trace['kappa0'][burnin::thin][model_idx_sample == m]
     plt.subplot2grid((5,4), (3+m, 1), colspan=2)
-    plt.hist(kappa0_sample)
-    plt.title(r'Post. $\kappa_0$ for M=%s' % (m+1))
+    plt.hist(kappa0_sample, bins=20)
+    plt.title(r'Post. $\kappa_0$ for M=%s' % (m+1), fontsize=14)
     plt.xlabel(r'$\kappa_0$')
+    plt.xlim(0, 30)
     for i in range(0, 4):
         kappa1_sample = trace['kappa1'][:,i][burnin::thin][model_idx_sample == m]
         plt.subplot2grid((5,4), (m+1, i))
         plt.hist(kappa1_sample)
-        plt.title(r'Post. $\kappa_%s$ for M=%s' % (i, m+1))
-        plt.xlabel(r'$\kappa_%s$' % i)
+        plt.title(r'Post. $\kappa_%s$ for M=%s' % (i+1, m+1), fontsize=14)
+        plt.xlabel(r'$\kappa_%s$' % (i+1))
+        plt.xlim(0, 30)
 
 plt.tight_layout()
 plt.savefig('Figure_10.3-4.png')
 plt.show()
-
-
 
