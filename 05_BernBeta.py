@@ -108,7 +108,7 @@ def bern_beta(prior_shape, data_vec, cred_mass=0.95):
                         color='blue', alpha=0.3)
     return intervals
 
-data_vec = np.repeat([1, 0], [11, 3])  # 11 heads, 2 tail
+data_vec = np.repeat([1, 0], [11, 3])  # 11 heads, 3 tail
 intervals = bern_beta(prior_shape=[100, 100], data_vec=data_vec)
 plt.savefig('Figure_5.2.png')
 plt.show()
