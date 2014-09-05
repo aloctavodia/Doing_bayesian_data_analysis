@@ -63,11 +63,11 @@ with pm.Model() as model:
     start = pm.find_MAP()
     steps = [pm.Metropolis([i]) for i in model.unobserved_RVs[1:]]
     steps.append(pm.ElemwiseCategoricalStep(var=model_index,values=[0,1]))
-    trace = pm.sample(10000, steps, start=start, progressbar=False)
+    trace = pm.sample(50000, steps, start=start, progressbar=False)
 
 
 # EXAMINE THE RESULTS.
-burnin = 10000
+burnin = 1000
 thin = 1
 model_idx_sample = trace['model_index'][burnin::thin]
 
@@ -98,4 +98,3 @@ for m in range(0, 2):
 plt.tight_layout()
 plt.savefig('Figure_10.3-4.png')
 plt.show()
-
