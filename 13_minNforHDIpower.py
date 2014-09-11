@@ -38,8 +38,8 @@ def minNforHDIpower(genPriorMean, genPriorN, HDImaxwid=None, nullVal=None,
             # input, not a function.
             hdiMat[zIdx] = HDIofICDF(beta, credMass=HDImass, a=(z + audPriorA), 
                                      b=(sampleSize - z + audPriorB))
-        hdiWid = hdiMat[:,1] - hdiMat[:,0]
         if HDImaxwid != None:
+            hdiWid = hdiMat[:,1] - hdiMat[:,0]
             powerHDI = np.sum(pzvec[hdiWid < HDImaxwid])
         if nullVal != None:
             powerHDI = np.sum(pzvec[(hdiMat[:,0] > ROPE[1]) | 
@@ -53,5 +53,6 @@ def minNforHDIpower(genPriorMean, genPriorN, HDImaxwid=None, nullVal=None,
             sampleSize += 1
     return sampleSize
 
-print minNforHDIpower(genPriorMean=.85 , genPriorN=2000 , nullVal=.5, verbose=False)
+print minNforHDIpower(genPriorMean=.85 , genPriorN=2000 , nullVal=0.5, verbose=False)
+#print minNforHDIpower(genPriorMean=.85 , genPriorN=10 , HDImaxwid=0.2, verbose=False)
 
