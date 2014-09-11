@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hpd import hpd
 
+
 def bern_grid(theta, p_theta, data, credib=.95):
     """
     Bayesian updating for Bernoulli likelihood and prior specified on a grid.
@@ -53,17 +54,17 @@ def bern_grid(theta, p_theta, data, credib=.95):
     plt.plot(theta, p_theta)
     plt.xlim(0, 1)
     plt.ylim(0, np.max(p_theta)*1.2)
-    plt.xlabel('$\\theta$')
-    plt.ylabel('$P(\\theta)$')
+    plt.xlabel(r'$\theta$')
+    plt.ylabel(r'$P(\theta)$')
     plt.title('Prior')
-    plt.text(locx, np.max(p_theta)/2, 'mean($\\theta$;%5.2f)' % mean_theta)
+    plt.text(locx, np.max(p_theta)/2, r'mean($\theta$;%5.2f)' % mean_theta)
     # Plot the likelihood:
     plt.subplot(3, 1, 2)
     plt.plot(theta, p_data_given_theta)
     plt.xlim(0, 1)
     plt.ylim(0, np.max(p_data_given_theta)*1.2)
-    plt.xlabel('$\\theta$')
-    plt.ylabel('$P(D|\\theta)$')
+    plt.xlabel(r'$\theta$')
+    plt.ylabel(r'$P(D|\theta)$')
     plt.title('Likelihood')
     plt.text(locx, np.max(p_data_given_theta)/2, 'data: z=%s, N=%s' % (z, N))
     # Plot the posterior:
@@ -72,11 +73,11 @@ def bern_grid(theta, p_theta, data, credib=.95):
     plt.plot(theta, p_theta_given_data)
     plt.xlim(0, 1)
     plt.ylim(0, np.max(p_theta_given_data)*1.2)
-    plt.xlabel('$\\theta$')
-    plt.ylabel('$P(\\theta|D)$')
+    plt.xlabel(r'$\theta$')
+    plt.ylabel(r'$P(\theta|D)$')
     plt.title('Posterior')
     loc = np.linspace(0, np.max(p_theta_given_data), 5)
-    plt.text(locx, loc[1], 'mean($\\theta$;%5.2f)' % mean_theta_given_data)
+    plt.text(locx, loc[1], r'mean($\theta$;%5.2f)' % mean_theta_given_data)
     plt.text(locx, loc[2], 'P(D) = %g' % p_data)
     # Plot the HDI
     plt.text(locx, loc[3],
