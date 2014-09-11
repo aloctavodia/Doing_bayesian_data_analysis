@@ -6,7 +6,7 @@ import numpy as np
 from scipy.stats import beta
 from scipy.special import beta as beta_func
 import matplotlib.pyplot as plt
-from hpd import hpd
+from HDIofICDF import *
 
 
 def bern_beta(prior_shape, data_vec, cred_mass=0.95):
@@ -59,10 +59,7 @@ def bern_beta(prior_shape, data_vec, cred_mass=0.95):
     post_b = b+N-z
     p_theta_given_data = beta.pdf(theta, a+z, b+N-z)
     # Determine the limits of the highest density interval
-    x = np.random.beta(a=post_shape[0], b=post_shape[1], size=5000)
-    intervals = hpd(x, alpha=1-cred_mass)  # hdp is a function from PyMC package
-                                          # takes a sample vector as input, not
-                                          # a function, like the HDIofICDF.R
+    intervals = HDIofICDF(beta, cred_mass, a=post_shape[0], b=post_shape[1])
 
     # Plot the results.
     plt.figure(figsize=(12, 12))
@@ -74,17 +71,17 @@ def bern_beta(prior_shape, data_vec, cred_mass=0.95):
     plt.plot(theta, p_theta)
     plt.xlim(0, 1)
     plt.ylim(0, np.max(p_theta)*1.2)
-    plt.xlabel('$\\theta$')
-    plt.ylabel('$P(\\theta)$')
+    plt.xlabel(r'$\theta$')
+    plt.ylabel(r'$P(\theta)$')
     plt.title('Prior')
-    plt.text(locx, np.max(p_theta)/2, 'beta($\\theta$;%s,%s)' % (a, b))
+    plt.text(locx, np.max(p_theta)/2, r'beta($\theta$;%s,%s)' % (a, b))
     # Plot the likelihood:
     plt.subplot(3, 1, 2)
     plt.plot(theta, p_data_given_theta)
     plt.xlim(0, 1)
     plt.ylim(0, np.max(p_data_given_theta)*1.2)
-    plt.xlabel('$\\theta$')
-    plt.ylabel('$P(D|\\theta)$')
+    plt.xlabel(r'$\theta$')
+    plt.ylabel(r'$P(D|\theta)$')
     plt.title('Likelihood')
     plt.text(locx, np.max(p_data_given_theta)/2, 'Data: z=%s, N=%s' % (z, N))
     # Plot the posterior:
@@ -92,19 +89,18 @@ def bern_beta(prior_shape, data_vec, cred_mass=0.95):
     plt.plot(theta, p_theta_given_data)
     plt.xlim(0, 1)
     plt.ylim(0, np.max(p_theta_given_data)*1.2)
-    plt.xlabel('$\\theta$')
-    plt.ylabel('$P(\\theta|D)$')
+    plt.xlabel(r'$\theta$')
+    plt.ylabel(r'$P(\theta|D)$')
     plt.title('Posterior')
     locy = np.linspace(0, np.max(p_theta_given_data), 5)
-    plt.text(locx, locy[1], 'beta($\\theta$;%s,%s)' % (post_a, post_b))
+    plt.text(locx, locy[1], r'beta($\theta$;%s,%s)' % (post_a, post_b))
     plt.text(locx, locy[2], 'P(D) = %g' % p_data)
     # Plot the HDI
     plt.text(locx, locy[3],
-             'Intervals =%s' % ', '.join('%.3f' % x for x in intervals))
-    for i in range(0, len(intervals), 2):
-        plt.fill_between(theta, 0, p_theta_given_data,
-                         where=np.logical_and(theta > intervals[i],
-                                              theta < intervals[i+1]),
+             'Intervals = %.3f - %.3f' % (intervals[0], intervals[1]))
+    plt.fill_between(theta, 0, p_theta_given_data,
+                    where=np.logical_and(theta > intervals[0],
+                    theta < intervals[1]),
                         color='blue', alpha=0.3)
     return intervals
 
