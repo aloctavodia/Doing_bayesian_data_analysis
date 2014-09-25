@@ -5,7 +5,6 @@ import numpy as np
 import pymc as pm
 from scipy.stats import norm
 import matplotlib.pyplot as plt
-import seaborn as sns
 from plot_post import plot_post
 
 
