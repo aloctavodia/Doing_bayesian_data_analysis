@@ -1,7 +1,8 @@
 """
-Random height, weight generator for males and females. Uses parameters from 
+Random height, weight generator for males and females. Uses parameters from
 Brainard, J. & Burmaster, D. E. (1992). Bivariate distributions for height and
 weight of men and women in the United States. Risk Analysis, 12(2), 267-275.
+John K. Kruschke, January 2008.
 """
 from __future__ import division
 from scipy.stats import multivariate_normal
