@@ -6,7 +6,7 @@ import pymc as pm
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 from plot_post import plot_post
-
+import seaborn as sns
 
 # THE DATA.
 
