@@ -33,7 +33,7 @@ zy = (y - y_m) / y_sd
 with pm.Model() as model:
     # define the priors
     beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
-    beta1 = pm.Normal('beta1', 0, 1.0E-12)
+    beta1 = pm.Normal('beta1',mu= 0, tau=1.0E-12)
     tau = pm.Gamma('tau', 0.001, 0.001)
     # define the likelihood
     mu = beta0 + beta1 * zx
