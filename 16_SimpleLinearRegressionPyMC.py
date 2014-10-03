@@ -6,6 +6,7 @@ from __future__ import division
 import numpy as np
 import pymc as pm
 from scipy.stats import norm
+from scipy.interpolate import spline
 import matplotlib.pyplot as plt
 from plot_post import plot_post
 from hpd import *
@@ -148,9 +149,17 @@ plt.ylabel('Y (weight in pounds)')
 plt.title('Data with 95% HDI & Mean of Posterior Predictions')
 # Superimpose posterior predicted 95% HDIs:
 y_post_pred_ave = np.average(y_post_pred, axis=1)
-plt.errorbar(x_post_pred,y_post_pred_ave, 
-             yerr=[y_post_pred_ave-y_HDI_lim[:,0],
-                   y_HDI_lim[:,1]-y_post_pred_ave], fmt='.')
+#Book version of the HDI representation
+#plt.errorbar(x_post_pred,y_post_pred_ave, 
+#             yerr=[abs(y_HDI_lim[:,0]-y_post_pred_ave),
+#                   abs(y_HDI_lim[:,1]-y_post_pred_ave)], fmt='.')
+
+#Smoothed version of the HDI representation
+x_new = np.linspace(x_post_pred.min(), x_post_pred.max(), 200)
+y_HDI_lim_smooth = spline(x_post_pred, y_HDI_lim, x_new)
+plt.plot(x_post_pred, y_post_pred_ave)
+plt.fill_between(x_new, y_HDI_lim_smooth[:,0], y_HDI_lim_smooth[:,1], alpha=0.3)
+
 plt.savefig('Figure_16.6.png')
 
 plt.show()
