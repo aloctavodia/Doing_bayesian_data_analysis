@@ -45,7 +45,7 @@ with pm.Model() as model:
     yl = pm.T('yl', mu=mu, lam=tau, nu=tdf, observed=zy)
     # Generate a MCMC chain
     start = pm.find_MAP()
-    step = [pm.Metropolis([rv]) for rv in model.unobserved_RVs]
+    step = pm.Metropolis()
     trace = pm.sample(20000, step, start, progressbar=False)
 
 

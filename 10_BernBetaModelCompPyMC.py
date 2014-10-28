@@ -23,9 +23,8 @@ with pm.Model() as model:
     #likelihood
     y = pm.Bernoulli('y', theta, observed=y)
     start = pm.find_MAP()
-    step1 = pm.Metropolis([model_index])
-    step2 = pm.Metropolis([theta])
-    trace = pm.sample(10000, [step1, step2], start=start, progressbar=False)
+    step = pm.Metropolis()
+    trace = pm.sample(10000, step, start=start, progressbar=False)
 
 
 ## Check the results.

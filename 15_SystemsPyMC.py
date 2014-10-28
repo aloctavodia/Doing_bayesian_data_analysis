@@ -39,7 +39,7 @@ with pm.Model() as model:
     # Generate a MCMC chain
     #start = pm.find_MAP()
     #step = pm.Metropolis()
-    step = [pm.Metropolis([rv]) for rv in model.unobserved_RVs]
+    step = pm.Metropolis()
     trace = pm.sample(20000, step, progressbar=False)
 
 

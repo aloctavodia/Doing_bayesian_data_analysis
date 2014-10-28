@@ -56,9 +56,9 @@ with pm.Model() as model:
 
     # Sampling
     start = pm.find_MAP()
-    steps = [pm.Metropolis([i]) for i in model.unobserved_RVs[1:]]
-    steps.append(pm.ElemwiseCategoricalStep(var=model_index,values=[0,1]))
-    trace = pm.sample(20000, steps, start=start, progressbar=False)
+    step1 = pm.Metropolis(model.vars[1:])
+    step2 = pm.ElemwiseCategoricalStep(var=model_index,values=[0,1])
+    trace = pm.sample(20000, [step1, step2], start=start, progressbar=False)
 
 
 # EXAMINE THE RESULTS.
