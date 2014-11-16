@@ -6,7 +6,6 @@ import numpy as np
 import pymc as pm
 import pandas as pd
 from scipy.stats import norm
-from scipy.interpolate import spline
 import matplotlib.pyplot as plt
 from plot_post import plot_post
 from hpd import *
@@ -26,7 +25,7 @@ if dataSource == "Guber1999":
     nData = len(data)
     y = data[predictedName]
     x = data[predictorNames]
-    nPredictors = len(x.columns)
+    n_predictors = len(x.columns)
 
 
 if dataSource == "McIntyre1994":
@@ -46,7 +45,7 @@ if dataSource == "random":
     # True parameter values:
     betaTrue = np.repeat(0, 21)
     betaTrue = np.insert(betaTrue, [0,0,0], [100, 1, 2])  # beta0 is first component
-    nPredictors = len(betaTrue) - 1
+    n_predictors = len(betaTrue) - 1
     sdTrue = 2
     tauTrue = 1/sdTrue**2
     # Random X values:
@@ -54,23 +53,23 @@ if dataSource == "random":
     xM = 5
     xSD = 2
     nData = 100
-    x = norm.rvs(xM, xSD, nPredictors*nData).reshape(100, -1)
-    x = pd.DataFrame(x, columns=['X%s' % i for i in range(0, nPredictors)])
+    x = norm.rvs(xM, xSD, n_predictors*nData).reshape(100, -1)
+    x = pd.DataFrame(x, columns=['X%s' % i for i in range(0, n_predictors)])
     # Random Y values generated from linear model with true parameter values:
     y = np.sum(x * betaTrue[1:].T, axis=1) + betaTrue[0] + norm.rvs(0, sdTrue, nData)
     predictedName = "Y"
    # Select which predictors to include
-    includeOnly = range(0, nPredictors) # default is to include all
+    includeOnly = range(0, n_predictors) # default is to include all
     x = x.iloc[includeOnly]
     predictorNames = x.columns
-    nPredictors = len(predictorNames)
+    n_predictors = len(predictorNames)
 
 
 # THE MODEL
 with pm.Model() as model:
     # define the priors
     beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
-    beta1 = pm.Normal('beta1', mu= 0, tau=1.0E-12, shape=nPredictors)
+    beta1 = pm.Normal('beta1', mu= 0, tau=1.0E-12, shape=n_predictors)
     tau = pm.Gamma('tau', 0.01, 0.01)
     # define the likelihood
     #mu = beta0 + beta1[0] * x.values[:,0] + beta1[1] * x.values[:,1]
@@ -100,20 +99,19 @@ thin = 1
 
 
 # Extract chain values:
-b0Samp = trace['beta0'][burnin::thin]
-bSamp = trace['beta1'][burnin::thin]
-TauSamp = trace['tau'][burnin::thin]
-SigmaSamp = 1 / np.sqrt(TauSamp) # Convert precision to SD
-chainLength = len(TauSamp)
+b0_samp = trace['beta0'][burnin::thin]
+b_samp = trace['beta1'][burnin::thin]
+Tau_samp = trace['tau'][burnin::thin]
+Sigma_samp = 1 / np.sqrt(Tau_samp) # Convert precision to SD
+chain_length = len(Tau_samp)
 
-if nPredictors >= 6: # don't display if too many predictors
-    nPredictors == 6
+if n_predictors >= 6: # don't display if too many predictors
+    n_predictors == 6
 
 columns = ['Sigma y', 'Intercept']
-[columns.append('Slope_%s' % i) for i in predictorNames[:nPredictors]]
-traces = np.array([SigmaSamp, b0Samp, bSamp[:,0], bSamp[:,1]]).T ## XXX
+[columns.append('Slope_%s' % i) for i in predictorNames[:n_predictors]]
+traces = np.array([Sigma_samp, b0_samp, b_samp[:,0], b_samp[:,1]]).T
 df = pd.DataFrame(traces, columns=columns)
-plt.figure()
 sns.set_style('dark')
 g = sns.PairGrid(df)
 g.map(plt.scatter)
@@ -123,17 +121,36 @@ plt.savefig('Figure_17.5b.png')
 sns.set_style('darkgrid')
 
 plt.figure(figsize=(16,4))
-plt.subplot(1, nPredictors+2, 1)
-plot_post(SigmaSamp, xlab=r'$\sigma y$', show_mode=False, framealpha=0.5)
-plt.subplot(1, nPredictors+2, 2)
-plot_post(b0Samp, xlab='Intercept', show_mode=False, framealpha=0.5)
+plt.subplot(1, n_predictors+2, 1)
+plot_post(Sigma_samp, xlab=r'$\sigma y$', show_mode=False, framealpha=0.5)
+plt.subplot(1, n_predictors+2, 2)
+plot_post(b0_samp, xlab='Intercept', show_mode=False, framealpha=0.5)
 
-for i in range(0, nPredictors):
-    plt.subplot(1, nPredictors+2, 3+i)
-    plot_post(bSamp[:,i], xlab='Slope_%s' % predictorNames[i],
+for i in range(0, n_predictors):
+    plt.subplot(1, n_predictors+2, 3+i)
+    plot_post(b_samp[:,i], xlab='Slope_%s' % predictorNames[i],
               show_mode=False, framealpha=0.5, comp_val=0)
 plt.tight_layout()
 plt.savefig('Figure_17.5a.png')
 
+
+# Posterior prediction:
+# Define matrix for recording posterior predicted y values for each xPostPred.
+# One row per xPostPred value, with each row holding random predicted y values.
+y_post_pred = np.zeros((len(x), chain_length))
+# Define matrix for recording HDI limits of posterior predicted y values:
+y_HDI_lim = np.zeros((len(x), 2))
+# Generate posterior predicted y values.
+# This gets only one y value, at each x, for each step in the chain.
+#or chain_idx in range(chain_length):
+for chain_idx in range(chain_length):
+    y_post_pred[:,chain_idx] = norm.rvs(loc = b0_samp[chain_idx] + np.dot(b_samp[chain_idx], x.values.T), 
+                                        scale = np.repeat([Sigma_samp[chain_idx]], [len(x)]))
+
+for x_idx in range(len(x)):
+    y_HDI_lim[x_idx] = hpd(y_post_pred[x_idx])
+
+for i in range(len(x)):
+    print np.mean(y_post_pred, axis=1)[i], y_HDI_lim[i]
 
 plt.show()

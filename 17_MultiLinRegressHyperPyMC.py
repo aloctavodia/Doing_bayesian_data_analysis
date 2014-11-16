@@ -1,12 +1,11 @@
 """
-Multiple linear regression
+Multiple linear regression with hyperpriors.
 """
 from __future__ import division
 import numpy as np
 import pymc as pm
 import pandas as pd
 from scipy.stats import norm
-from scipy.interpolate import spline
 import matplotlib.pyplot as plt
 from plot_post import plot_post
 from hpd import *
@@ -121,7 +120,6 @@ columns = ['Sigma y', 'Intercept']
 [columns.append('Slope_%s' % i) for i in predictor_names[:n_predictors]]
 traces = np.array([sigma_samp, b0_samp, b_samp[:,0], b_samp[:,1]]).T
 df = pd.DataFrame(traces, columns=columns)
-plt.figure()
 sns.set_style('dark')
 g = sns.PairGrid(df)
 g.map(plt.scatter)
