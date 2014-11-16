@@ -1,0 +1,83 @@
+# From http://udel.edu/~mcdonald/statanovasig.html
+# "Here are some data on a shell measurement (the length of the anterior 
+# adductor muscle scar, standardized by dividing by length) in the mussel 
+# Mytilus trossulus from five locations: Tillamook, Oregon; Newport, Oregon;
+# Petersburg, Alaska; Magadan, Russia; and Tvarminne, Finland, 
+# taken from a much larger data set used in McDonald et al. (1991)." 
+#
+# McDonald, J. H., R. Seed and R. K. Koehn. 1991. 
+# Allozymes and morphometric characters of three species of Mytilus
+# in the Northern and Southern Hemispheres. 
+# Mar. Biol. 111:323-333.
+#
+# Group code: 
+# 1=Tillamook,Oregon  
+# 2=Newport,Oregon  
+# 3=Petersburg,Alaska  
+# 4=Magadan,Russia  
+# 5=Tvarminne,Finland
+Group Size Site
+1 0.0571 OregonT                
+1 0.0813 OregonT                 
+1 0.0831 OregonT                 
+1 0.0976 OregonT                 
+1 0.0817 OregonT                 
+1 0.0859 OregonT                 
+1 0.0735 OregonT                 
+1 0.0659 OregonT                 
+1 0.0923 OregonT    
+1 0.0836 OregonT     
+2 0.0873 OregonN
+2 0.0662 OregonN
+2 0.0672 OregonN
+2 0.0819 OregonN
+2 0.0749 OregonN
+2 0.0649 OregonN
+2 0.0835 OregonN
+2 0.0725 OregonN
+3 0.0974 Alaska
+3 0.1352 Alaska
+3 0.0817 Alaska
+3 0.1016 Alaska
+3 0.0968 Alaska
+3 0.1064 Alaska
+3 0.1050 Alaska
+4 0.1033 Russia
+4 0.0915 Russia
+4 0.0781 Russia
+4 0.0685 Russia
+4 0.0677 Russia
+4 0.0697 Russia
+4 0.0764 Russia
+4 0.0689 Russia
+5 0.0703 Finland
+5 0.1026 Finland
+5 0.0956 Finland
+5 0.0973 Finland
+5 0.1039 Finland
+5 0.1045 Finland
+#
+#    http://udel.edu/~mcdonald/statanovaunplanned.html
+#    shows that Tukey-Kramer method of unplanned comparisons
+#    groups 
+#    Newport/Magadan/Tillamook (2/4/1), 
+#    Magadan/Tillamook/Tvarminne (4/1/5), 
+#    and Tvarminne/Petersburg (5/3).
+#    
+#    From http://udel.edu/~mcdonald/statanovaplanned.html:
+#    Really important note about planned comparisons
+#      Planned comparisons must be planned before you look at the data. If you 
+#    look at some data, pick out an interesting comparison, then analyze it as 
+#    if it were a planned comparison, you will be committing scientific fraud. 
+#    For example, if you look at the mean arch heights for the nine sports, see 
+#    that cross-country has the lowest mean and swimming has the highest mean, 
+#    then compare just those two means, your P-value will be much too low. This 
+#    is because there are 36 possible pairwise comparisons in a set of 9 means. 
+#    You expect 5 percent, or 1 out of 20, tests to be "significant" at the 
+#    P<0.05 level, even if all the data really fit the null hypothesis, so 
+#    there's a good chance that the most extreme comparison in a set of 36 
+#    will have a P-value less than 0.05.
+#      It would be acceptable to run a pilot experiment and plan your planned 
+#    comparisons based on the results of the pilot experiment. However, if you 
+#    do this you could not include the data from the pilot experiment in the 
+#    analysis; you would have to limit your anova to the new data.
