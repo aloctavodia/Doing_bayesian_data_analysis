@@ -62,7 +62,7 @@ if dataSource == "random":
     y = np.sum(x * beta_true[1:].T, axis=1) + beta_true[0] + norm.rvs(0, sd_true, n_data)
    # Select which predictors to include
     include_only = range(0, n_predictors) # default is to include all
-    x = x.iloc[include_only]
+    #x = x.iloc[include_only]
     predictor_names = x.columns
     n_predictors = len(predictor_names)
 
