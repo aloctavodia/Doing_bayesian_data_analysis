@@ -75,12 +75,12 @@ with pm.Model() as model:
     udfB = pm.Uniform('udfB', 0, 1)
     tdfB = 1 + tdfBgain * (-pm.log(1 - udfB))
     # define the priors
+    tau = pm.Gamma('tau', 0.01, 0.01)
     beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
     beta1 = pm.T('beta1', mu=muB, lam=tauB, nu=tdfB, shape=n_predictors)
-    tau = pm.Gamma('tau', 0.01, 0.01)
+    mu = beta0 + pm.dot(beta1, x.values.T)
     # define the likelihood
     #mu = beta0 + beta1[0] * x.values[:,0] + beta1[1] * x.values[:,1]
-    mu = beta0 + pm.dot(beta1, x.values.T)
     yl = pm.Normal('yl', mu=mu, tau=tau, observed=y)
     # Generate a MCMC chain
     start = pm.find_MAP()

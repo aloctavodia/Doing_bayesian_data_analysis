@@ -35,13 +35,13 @@ tdf_gain = 1 # 1 for low-baised tdf, 100 for high-biased tdf
 # THE MODEL
 with pm.Model() as model:
     # define the priors
-    beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
-    beta1 = pm.Normal('beta1', mu=0, tau=1.0E-12)
-    tau = pm.Gamma('tau', 0.001, 0.001)
     udf = pm.Uniform('udf', 0, 1)
     tdf = 1 - tdf_gain * pm.log(1 - udf) # tdf in [1,Inf).
-    # define the likelihood
+    tau = pm.Gamma('tau', 0.001, 0.001)
+    beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
+    beta1 = pm.Normal('beta1', mu=0, tau=1.0E-12)
     mu = beta0 + beta1 * zx
+    # define the likelihood
     yl = pm.T('yl', mu=mu, lam=tau, nu=tdf, observed=zy)
     # Generate a MCMC chain
     start = pm.find_MAP()

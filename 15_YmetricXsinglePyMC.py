@@ -26,7 +26,6 @@ with pm.Model() as model:
     y = pm.Normal('y', mu=mu, tau=tau, observed=y)
 #   Generate a MCMC chain
     start = pm.find_MAP()
-    #step = pm.Metropolis()
     step = pm.Metropolis()
     trace = pm.sample(5000, step, start, progressbar=False)
 

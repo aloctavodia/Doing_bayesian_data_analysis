@@ -33,11 +33,11 @@ zy = (y - y_m) / y_sd
 # THE MODEL
 with pm.Model() as model:
     # define the priors
+    tau = pm.Gamma('tau', 0.001, 0.001)
     beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
     beta1 = pm.Normal('beta1',mu= 0, tau=1.0E-12)
-    tau = pm.Gamma('tau', 0.001, 0.001)
-    # define the likelihood
     mu = beta0 + beta1 * zx
+    # define the likelihood
     yl = pm.Normal('yl', mu=mu, tau=tau, observed=zy)
     # Generate a MCMC chain
     start = pm.find_MAP()
