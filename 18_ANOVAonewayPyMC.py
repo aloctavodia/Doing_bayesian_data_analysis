@@ -6,6 +6,7 @@ import numpy as np
 import pymc as pm
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 from plot_post import plot_post
 from hpd import * 
 import seaborn as sns
@@ -19,7 +20,7 @@ if dataSource == "McDonaldSK1991":
     datarecord = pd.read_csv("McDonaldSK1991data.txt", sep='\s+', skiprows=18, skipfooter=25)
     y = datarecord['Size']
     Ntotal = len(y)
-    x = datarecord['Group'] - 1
+    x = (datarecord['Group'] - 1).values
     xnames = pd.unique(datarecord['Site'])
     NxLvl = len(xnames)
     contrast_dict = {'BIGvSMALL':[-1/3,-1/3,1/2,-1/3,1/2],
@@ -31,7 +32,43 @@ if dataSource == "McDonaldSK1991":
                        'ENGvOTH':[1/3,1/3,1/3,-1/2,-1/2],
                        'FINvRUS':[0,0,0,-1,1]}
 
-z = (y - y.mean())/y.std()
+
+if dataSource == "SolariLS2008":
+    datarecord = pd.read_csv("SolariLS2008data.txt", sep='\s+', skiprows=21)
+    y = datarecord['Acid']
+    Ntotal = len(y)
+    x = (datarecord['Type'] - 1).values
+    xnames = pd.unique(x)
+    NxLvl = len(xnames)
+    contrast_dict = {'G3vOTHER':[-1/8,-1/8,1,-1/8,-1/8,-1/8,-1/8,-1/8,-1/8]}
+
+
+if dataSource == "Random":
+    np.random.seed(47405)
+    ysdtrue = 4.0
+    a0true = 100
+    atrue = [2, -2]  # sum to zero
+    npercell = 8
+    x = []
+    y = []
+    for xidx in range(len(atrue)):
+        for subjidx in range(npercell):
+            x.append(xidx)
+            y.append(a0true + atrue[xidx] + norm.rvs(1, ysdtrue))
+    Ntotal = len(y)
+    NxLvl = len(set(x))
+#  # Construct list of all pairwise comparisons, to compare with NHST TukeyHSD:
+    contrast_dict = None
+    for g1idx in range(NxLvl):
+        for g2idx in range(g1idx+1, NxLvl):
+            cmpVec = np.repeat(0, NxLvl)
+            cmpVec[g1idx] = -1
+            cmpVec[g2idx] = 1
+            contrast_dict = (contrast_dict, cmpVec)
+
+
+z = (y - np.mean(y))/np.std(y)
+
 
 ## THE MODEL.
 with pm.Model() as model:
@@ -46,7 +83,7 @@ with pm.Model() as model:
     a = pm.Normal('a', mu=0 , tau=atau, shape=NxLvl)
     mu = a0 + a
     # define the likelihood
-    yl = pm.Normal('yl', mu[x.values], tau=tau, observed=z)
+    yl = pm.Normal('yl', mu[x], tau=tau, observed=z)
     # Generate a MCMC chain
     start = pm.find_MAP()
     steps = pm.Metropolis()
@@ -73,11 +110,11 @@ a_sample = trace['a'][burnin::thin]
 # Convert baseline to the original scale
 m_sample = a0_sample.repeat(NxLvl).reshape(len(a0_sample), NxLvl) + a_sample
 b0_sample = m_sample.mean(axis=1)
-b0_sample = b0_sample * y.std() + y.mean()
+b0_sample = b0_sample * np.std(y) + np.mean(y)
 # Convert baseline to the original scale
 n_sample = b0_sample.repeat(NxLvl).reshape(len(b0_sample), NxLvl)
 b_sample = (m_sample - n_sample)
-b_sample = b_sample * y.std()
+b_sample = b_sample * np.std(y)
 
 
 
@@ -97,7 +134,7 @@ if nContrasts > 0:
     count = 0
     for key, value in contrast_dict.items():
         contrast = np.dot(b_sample, value)
-        plt.subplot(2, 5, count)
+        plt.subplot(2, 4, count)
         plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 
                   show_mode=False, framealpha=0.5, 
                   bins=50)
