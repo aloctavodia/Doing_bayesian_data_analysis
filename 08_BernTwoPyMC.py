@@ -4,7 +4,7 @@ Inferring two binomial proportions using PyMC.
 from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 from plot_post import plot_post
 
 # Generate the data

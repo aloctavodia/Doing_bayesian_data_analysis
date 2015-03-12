@@ -2,7 +2,7 @@
 Bernoulli Likelihood with Hierarchical Prior!
 """
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 import sys
 from scipy.stats import beta, binom
 import matplotlib.pyplot as plt

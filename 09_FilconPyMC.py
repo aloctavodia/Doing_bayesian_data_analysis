@@ -2,7 +2,7 @@
 More Hierarchical models. The filtration-condensation experiment.
 """
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 import sys
 import matplotlib.pyplot as plt
 from plot_post import plot_post

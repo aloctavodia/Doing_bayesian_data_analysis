@@ -4,7 +4,7 @@ hierarchical model.
 '''
 from __future__ import division
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 from plot_post import plot_post

@@ -1,5 +1,5 @@
 """
-A simple graph drawn by Python.
+A simple graph drawn by Python :-)
 """
 import matplotlib.pyplot as plt
 import numpy as np

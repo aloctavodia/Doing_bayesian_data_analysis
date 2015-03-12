@@ -3,7 +3,7 @@ Inferring a binomial proportion using PyMC.
 """
 import matplotlib.pyplot as plt
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 from plot_post import *
 
 # Generate the data

@@ -3,7 +3,7 @@ Simple Robust Linear Regression
 """
 from __future__ import division
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 from scipy.stats import t, norm
 from scipy.interpolate import spline
 import matplotlib.pyplot as plt

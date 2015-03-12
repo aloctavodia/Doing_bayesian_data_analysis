@@ -3,7 +3,7 @@ One way BANOVA
 """
 from __future__ import division
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import norm

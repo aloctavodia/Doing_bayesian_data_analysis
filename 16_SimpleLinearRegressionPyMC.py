@@ -4,7 +4,7 @@ hierarchical model.
 """
 from __future__ import division
 import numpy as np
-import pymc as pm
+import pymc3 as pm
 from scipy.stats import norm
 from scipy.interpolate import spline
 import matplotlib.pyplot as plt
@@ -35,7 +35,7 @@ with pm.Model() as model:
     # define the priors
     tau = pm.Gamma('tau', 0.001, 0.001)
     beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
-    beta1 = pm.Normal('beta1',mu= 0, tau=1.0E-12)
+    beta1 = pm.Normal('beta1', mu=0, tau=1.0E-12)
     mu = beta0 + beta1 * zx
     # define the likelihood
     yl = pm.Normal('yl', mu=mu, tau=tau, observed=zy)
