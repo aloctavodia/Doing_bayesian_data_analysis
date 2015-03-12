@@ -8,5 +8,5 @@ This repository contains the Python version of the R programs described in the g
 
 All the code is adapted from the Kruschke's book, except hpd.py that is taken (without modifications) from the PyMC project.
 
-The name of the programs are the same used in the book, except they begin with a number indicating the chapter. All programs are written in Python and instead of BUGS/JAGS the [PyMC3](https://github.com/pymc-devs/pymc) module is used.
+The name of the programs are the same used in the book, except they begin with a number indicating the chapter. All programs are written in Python and instead of BUGS/JAGS the [PyMC3](http://pymc-devs.github.io/pymc3) module is used.
 
