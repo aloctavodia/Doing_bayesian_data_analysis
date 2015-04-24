@@ -48,7 +48,7 @@ plt.savefig('Figure_8.6.png')
 # Plot a histogram of the posterior differences of theta values.
 plt.figure()
 theta_diff = theta1_sample - theta2_sample
-plot_post(theta_diff, xlab=r'\theta1-theta2', comp_val=0.0, show_mode=False, bins=30)
+plot_post(theta_diff, xlab=r'$\theta_1 - \theta_2$', comp_val=0.0, show_mode=False, bins=30)
 plt.savefig('Figure_8.8.png')
 
 
