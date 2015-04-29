@@ -1,5 +1,5 @@
 """
-Testing a point ('Null') Hypothesis (not using seudopriors)
+Testing a point ('Null') Hypothesis (not using pseudopriors)
 """
 from __future__ import division
 import numpy as np
