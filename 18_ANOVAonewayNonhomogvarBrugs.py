@@ -85,9 +85,9 @@ with pm.Model() as model:
     tau = pm.Gamma('tau', sG, rG) 
     a0 = pm.Normal('a0', mu=0, tau=0.001) # y values are assumed to be standardized
     a = pm.Normal('a', mu=0 , tau=atau, shape=NxLvl)
-    mu = a0 + a
+    mu = a0 + a[x]
     # define the likelihood
-    yl = pm.Normal('yl', mu[x], tau=tau, observed=z)
+    yl = pm.Normal('yl', mu=mu, tau=tau, observed=z)
     # Generate a MCMC chain
     start = pm.find_MAP()
     steps = pm.Metropolis()
