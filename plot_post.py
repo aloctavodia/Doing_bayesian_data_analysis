@@ -64,5 +64,7 @@ def plot_post(param_sample_vec, cred_mass=0.95, comp_val=False,
 #    # Display the HDI.
     plt.plot(HDI, [0, 0], linewidth=6, color='k', label='HDI %.1f%% %.3f-%.3f' % (cred_mass*100, HDI[0], HDI[1]))
     plt.legend(loc='upper left', fontsize=labelsize, framealpha=framealpha)
+    frame = plt.gca()
+    frame.axes.get_yaxis().set_ticks([])
     return post_summary
 
