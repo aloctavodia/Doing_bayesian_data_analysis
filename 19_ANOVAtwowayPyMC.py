@@ -60,68 +60,7 @@ if dataSource == "Salary":
            'BFINvOTHxFT1vOTH':np.outer([1, -1/3, -1/3, -1/3], [1, -1/2, -1/2])}
     
 
-        
-#if ( data_source == "Random" ) {
-#  fnroot = paste( fnroot , data_source , sep="" )
-#  set.seed(47405)
-#  ysdtrue = 3.0
-#  a0true = 100
-#  a1true = c( 2 , 0 , -2 ) # sum to zero
-#  a2true = c( 3 , 1 , -1 , -3 ) # sum to zero
-#  a1a2true = matrix( c( 1,-1,0, -1,1,0, 0,0,0, 0,0,0 ),# row and col sum to zero
-#                     nrow=length(a1true) , ncol=length(a2true) , byrow=F )
-#  npercell = 8
-#  datarecord = matrix( 0, ncol=3 , nrow=length(a1true)*length(a2true)*npercell )
-#  colnames(datarecord) = c("y","x1","x2")
-#  rowidx = 0
-#  for ( x1idx in 1:length(a1true) ) {
-#    for ( x2idx in 1:length(a2true) ) {
-#      for ( subjidx in 1:npercell ) {
-#        rowidx = rowidx + 1
-#        datarecord[rowidx,"x1"] = x1idx
-#        datarecord[rowidx,"x2"] = x2idx
-#        datarecord[rowidx,"y"] = ( a0true + a1true[x1idx] + a2true[x2idx]
-#                                 + a1a2true[x1idx,x2idx] + rnorm(1,0,ysdtrue) )
-#      }
-#    }
-#  }
-#  datarecord = data.frame( y=datarecord[,"y"] ,
-#                           x1=as.factor(datarecord[,"x1"]) ,
-#                           x2=as.factor(datarecord[,"x2"]) )
-#  y = as.numeric(datarecord$y)
-#  x1 = as.numeric(datarecord$x1)
-#  x1names = levels(datarecord$x1)
-#  x2 = as.numeric(datarecord$x2)
-#  x2names = levels(datarecord$x2)
-#  Ntotal = length(y)
-#  Nx1Lvl = length(unique(x1))
-#  Nx2Lvl = length(unique(x2))
-#  x1contrast_dict = list( X1_1v3 = c( 1 , 0 , -1 ) ) #
-#  x2contrast_dict =  list( X2_12v34 = c( 1/2 , 1/2 , -1/2 , -1/2 ) ) #
-#  x1x2contrast_dict = list(
-#    IC_11v22 = outer( c(1,-1,0) , c(1,-1,0,0) ) ,
-#    IC_23v34 = outer( c(0,1,-1) , c(0,0,1,-1) )
-#  )
-#}
-
-## Load the data:
-#if ( data_source == "Ex19.3" ) {
-#  fnroot = paste( fnroot , data_source , sep="" )
-#  y = c( 101,102,103,105,104, 104,105,107,106,108, 105,107,106,108,109, 109,108,110,111,112 )
-#  x1 = c( 1,1,1,1,1, 1,1,1,1,1, 2,2,2,2,2, 2,2,2,2,2 )
-#  x2 = c( 1,1,1,1,1, 2,2,2,2,2, 1,1,1,1,1, 2,2,2,2,2 )
-#  # S = c( 1,2,3,4,5, 1,2,3,4,5, 1,2,3,4,5, 1,2,3,4,5 )
-#  x1names = c("x1.1","x1.2")
-#  x2names = c("x2.1","x2.2")
-#  # Snames = c("S1","S2","S3","S4","S5")
-#  Ntotal = length(y)
-#  Nx1Lvl = length(unique(x1))
-#  Nx2Lvl = length(unique(x2))
-#  # NSLvl = length(unique(S))
-#  x1contrast_dict = list( X1.2vX1.1 = c( -1 , 1 ) )
-#  x2contrast_dict = list( X2.2vX2.1 = c( -1 , 1 ) )
-#  x1x2contrast_dict = NULL # list( matrix( 1:(Nx1Lvl*Nx2Lvl) , nrow=Nx1Lvl ) )
-#}
+# TODO add   "Random"  and "Ex19.3"  sources
 
 z = (y - np.mean(y))/np.std(y)
 
