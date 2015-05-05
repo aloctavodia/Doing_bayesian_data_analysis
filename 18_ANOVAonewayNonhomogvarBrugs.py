@@ -10,6 +10,7 @@ from scipy.stats import norm
 from plot_post import plot_post
 from hpd import * 
 import seaborn as sns
+from theano import tensor as T
 
 # THE DATA.
 # Specify data source:
@@ -81,11 +82,12 @@ with pm.Model() as model:
     sG = m**2 / d**2 
     rG = m / d**2 
     # define the priors
-    sigma = pm.Uniform('sigma', 0, 10) # y values are assumed to be standardized
     tau = pm.Gamma('tau', sG, rG) 
     a0 = pm.Normal('a0', mu=0, tau=0.001) # y values are assumed to be standardized
     a = pm.Normal('a', mu=0 , tau=atau, shape=NxLvl)
-    mu = a0 + a[x]
+    
+    b = pm.Deterministic('b', a - T.mean(a))
+    mu = a0 + b[x]
     # define the likelihood
     yl = pm.Normal('yl', mu=mu, tau=tau, observed=z)
     # Generate a MCMC chain
@@ -95,31 +97,25 @@ with pm.Model() as model:
 
 
 # EXAMINE THE RESULTS
-burnin = 2000
-thin = 50
+burnin = 1000
+thin = 10
 
 # Print summary for each trace
 #pm.summary(trace[burnin::thin])
 #pm.summary(trace)
 
 # Check for mixing and autocorrelation
-pm.autocorrplot(trace[burnin::thin], vars=model.unobserved_RVs[:-1])
+#pm.autocorrplot(trace[burnin::thin], vars=model.unobserved_RVs[:-1])
 
 ## Plot KDE and sampled values for each parameter.
 #pm.traceplot(trace[burnin::thin])
 pm.traceplot(trace)
 
-a0_sample = trace['a0'][burnin::thin]
-a_sample = trace['a'][burnin::thin]
-# Convert baseline to the original scale
-m_sample = a0_sample.repeat(NxLvl).reshape(len(a0_sample), NxLvl) + a_sample
-b0_sample = m_sample.mean(axis=1)
-b0_sample = b0_sample * np.std(y) + np.mean(y)
-# Convert baseline to the original scale
-n_sample = b0_sample.repeat(NxLvl).reshape(len(b0_sample), NxLvl)
-b_sample = (m_sample - n_sample)
-b_sample = b_sample * np.std(y)
 
+a0_sample = trace['a0'][burnin::thin]
+b_sample = trace['b'][burnin::thin]
+b0_sample = a0_sample * np.std(y) + np.mean(y)
+b_sample = b_sample * np.std(y)
 
 
 plt.figure(figsize=(20, 4))
