@@ -58,10 +58,59 @@ if dataSource == "Salary":
                       'FT2vFT3':[0,1,-1]}
     x1x2contrastDict = {'CHEMvTHTRxFT1vFT3':np.outer([0, 0, 1, -1], [1,0,-1]),
            'BFINvOTHxFT1vOTH':np.outer([1, -1/3, -1/3, -1/3], [1, -1/2, -1/2])}
+
     
+if dataSource == "Random":
+    np.random.seed(47405)
+    ysdtrue = 3.0
+    a0true = 100
+    a1true = np.array([2, 0, -2]) # sum to zero
+    a2true = np.array([3, 1, -1, -3]) # sum to zero
+    a1a2true = np.array([[1,-1,0, 0], [-1,1,0,0], [0,0,0,0]])
+    
+    npercell = 8
+    index = np.arange(len(a1true)*len(a2true)*npercell)
+    datarecord = pd.DataFrame(index=index, columns=["y","x1","x2"])
 
-# TODO add   "Random"  and "Ex19.3"  sources
+    rowidx = 0
+    for x1idx in range(0, len(a1true)):
+        for x2idx in range(0, len(a2true)):
+            for subjidx in range(0, npercell):
+                datarecord['x1'][rowidx] = x1idx
+                datarecord['x2'][rowidx] = x2idx
+                datarecord['y'][rowidx] = a0true + a1true[x1idx] + a2true[x2idx] 
+                + a1a2true[x1idx,x2idx] + norm.rvs(loc=0, scale=ysdtrue, size=1)[0]
+                rowidx += 1
 
+    y = datarecord['y']
+    x1 = datarecord['x1']
+    x1names = x1 #levels(datarecord$x1)
+    x2 = datarecord['x2']
+    x2names = x2 #levels(datarecord$x2)
+    Ntotal = len(y)
+    Nx1Lvl = len(x1.unique())
+    Nx2Lvl = len(x2.unique())
+    x1contrast_dict = {'X1_1v3': [1, 0, -1]} #
+    x2contrast_dict =  {'X2_12v34':[1/2, 1/2, -1/2, -1/2]} #
+    x1x2contrast_dict = {'IC_11v22': np.outer([1, -1, 0], [1, -1, 0, 0]),
+    'IC_23v34': np.outer([0, 1, -1], [0, 0, 1, -1])}
+    
+if dataSource == 'Ex19.3':
+    y =  [101,102,103,105,104, 104,105,107,106,108, 105,107,106,108,109, 109,108,110,111,112]
+    x1 = [1,1,1,1,1, 1,1,1,1,1, 2,2,2,2,2, 2,2,2,2,2]
+    x2 = [1,1,1,1,1, 2,2,2,2,2, 1,1,1,1,1, 2,2,2,2,2]
+    S = [1,2,3,4,5, 1,2,3,4,5, 1,2,3,4,5, 1,2,3,4,5]
+    x1names = ['x1.1' ,'x1.2']
+    x2names = ['x2.1', "x2.2"]
+    Snames = ['S1', 'S2', 'S3', 'S4', 'S5']
+    Ntotal = len(y)
+    Nx1Lvl = len(set(x1))
+    Nx2Lvl = len(set(x2))
+    NSLvl = len(set(S))
+    x1contrast_dict = {'X1.2vX1.1':[-1 , 1]}
+    x2contrast_dict = {'X2.2vX2.1':[-1 , 1]}
+    x1x2contrast_dict = None #np.arange(0, Nx1Lvl*Nx2Lvl).reshape(Nx1Lvl, -1).T
+    
 z = (y - np.mean(y))/np.std(y)
 
 # THE MODEL.
