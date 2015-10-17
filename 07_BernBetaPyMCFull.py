@@ -26,7 +26,7 @@ with pm.Model() as model:
 # create an array with the posterior sample
 theta_sample = trace['theta']
 
-print theta_sample
+print(theta_sample)
 
 plt.subplot(1, 2, 1)
 plt.plot(theta_sample[:500], np.arange(500), marker='o')

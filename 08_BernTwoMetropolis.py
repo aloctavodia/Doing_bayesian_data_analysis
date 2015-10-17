@@ -2,7 +2,7 @@
 Use this program as a template for experimenting with the Metropolis algorithm
 applied to 2 parameters called theta1,theta2 defined on the domain [0,1]x[0,1].
 """
-from __future__ import division
+
 import numpy as np
 from scipy.stats import beta
 import matplotlib.pyplot as plt

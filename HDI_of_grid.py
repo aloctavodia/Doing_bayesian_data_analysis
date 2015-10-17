@@ -26,4 +26,4 @@ if  __name__ =='__main__':
     probDensityVec = beta.pdf(theta1_grid, 3, 3)
     probMassVec = probDensityVec / np.sum(probDensityVec)
     HDIinfo = HDIofGrid(probMassVec)
-    print HDIinfo
+    print(HDIinfo)

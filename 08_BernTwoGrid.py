@@ -1,7 +1,7 @@
 """
 Inferring two binomial proportions via grid aproximation.
 """
-from __future__ import division
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from scipy.stats import beta
