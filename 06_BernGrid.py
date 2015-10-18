@@ -3,8 +3,6 @@ Inferring a binomial proportion via grid aproximation.
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from hpd import hpd
-
 
 def bern_grid(theta, p_theta, data, credib=.95):
     """
@@ -30,6 +28,10 @@ def bern_grid(theta, p_theta, data, credib=.95):
      Call the function.
      > posterior = bern_grid( theta=theta_grid , p_theta=prior , data=data_vec )
     """
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from hpd import hpd
 
 # Create summary values of data
     z = sum(data[data == 1])  # number of 1's in data

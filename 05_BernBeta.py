@@ -1,13 +1,8 @@
 """
 Inferring a binomial proportion via exact mathematical analysis.
 """
-import sys
 import numpy as np
-from scipy.stats import beta
-from scipy.special import beta as beta_func
 import matplotlib.pyplot as plt
-from HDIofICDF import *
-
 
 def bern_beta(prior_shape, data_vec, cred_mass=0.95):
     """Bayesian updating for Bernoulli likelihood and beta prior.
@@ -26,6 +21,13 @@ def bern_beta(prior_shape, data_vec, cred_mass=0.95):
        with highest posterior density interval.
      Example of use:
      post_shape = bern_beta(prior_shape=[1,1] , data_vec=[1,0,0,1,1])"""
+
+    import sys
+    import numpy as np
+    from scipy.stats import beta
+    from scipy.special import beta as beta_func
+    import matplotlib.pyplot as plt
+    from HDIofICDF import HDIofICDF
 
     # Check for errors in input arguments:
     if len(prior_shape) != 2:

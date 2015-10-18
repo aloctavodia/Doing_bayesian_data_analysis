@@ -4,13 +4,11 @@ applied to 2 parameters called theta1,theta2 defined on the domain [0,1]x[0,1].
 """
 
 import numpy as np
-from scipy.stats import beta
 import matplotlib.pyplot as plt
-
+from scipy.stats import beta
 
 # Define the likelihood function.
 # The input argument is a vector: theta = [theta1 , theta2]
-
 def likelihood(theta):
     # Data are constants, specified here:
     z1, N1, z2, N2 = 5, 7, 2, 7
@@ -18,20 +16,20 @@ def likelihood(theta):
                  * theta[1]**z2 * (1-theta[1])**(N2-z2))
     return likelihood
 
-
 # Define the prior density function.
 # The input argument is a vector: theta = [theta1 , theta2]
 def prior(theta):
+    from scipy.stats import beta
     # Here's a beta-beta prior:
     a1, b1, a2, b2 = 3, 3, 3, 3
     prior = beta.pdf(theta[0], a1, b1) * beta.pdf(theta[1], a2, b2) 
     return prior
 
-
 # Define the relative probability of the target distribution, as a function 
 # of theta.  The input argument is a vector: theta = [theta1 , theta2].
 # For our purposes, the value returned is the UNnormalized posterior prob.
-def target_rel_prob(theta):
+def target_rel_prob(theta,
+                    likelihood=likelihood, prior=prior):
     if ((theta >= 0.0).all() & (theta <= 1.0).all()):
         target_rel_probVal =  likelihood(theta) * prior(theta)
     else:

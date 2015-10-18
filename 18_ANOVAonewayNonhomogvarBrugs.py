@@ -131,7 +131,7 @@ plt.savefig('Figure_18.xa.png')
 nContrasts = len(contrast_dict)
 if nContrasts > 0:
     plt.figure(figsize=(20, 8))
-    count = 0
+    count = 1
     for key, value in list(contrast_dict.items()):
         contrast = np.dot(b_sample, value)
         plt.subplot(2, 4, count)

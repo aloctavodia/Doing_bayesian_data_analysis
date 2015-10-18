@@ -7,16 +7,10 @@ import numpy as np
 from scipy.stats import beta
 from plot_post import *
 
-
-
-# Specify the data, to be used in the likelihood function.
-# This is a vector with one component per flip,
-# in which 1 means a "head" and 0 means a "tail".
-my_data = np.repeat([1, 0], [11, 3])  # 11 heads, 2 tail
-
 # Define the Bernoulli likelihood function, p(D|theta).
 # The argument theta could be a vector, not just a scalar.
 def likelihood(theta, data):
+    import numpy as np
     theta = np.array(theta) # ensure you have an array
     z = sum(data[data == 1])  # number of 1's in Data
     N = len(data)  # number of flips in Data
@@ -33,11 +27,11 @@ def likelihood(theta, data):
         p_data_given_theta[(theta > 1) | (theta < 0)] = 0
     return p_data_given_theta
 
-
 # Define the prior density function. For purposes of computing p(D),
 # at the end of this program, we want this prior to be a proper density.
 # The argument theta could be a vector, not just a scalar.
 def prior(theta):
+    import numpy as np
     theta = np.array(theta) # ensure you have an array
 # For kicks, here's a bimodal prior. To try it, uncomment the next 2 lines.
     #from scipy.stats import beta
@@ -54,14 +48,19 @@ def prior(theta):
         prior[(theta > 1) | (theta < 0)] = 0
     return prior
 
-
-
 # Define the relative probability of the target distribution, 
 # as a function of vector theta. For our application, this
 # target distribution is the unnormalized posterior distribution.
-def target_rel_prob(theta, data):
+def target_rel_prob(theta, data,
+                    likelihood=likelihood, prior=prior):
+    import numpy as np
     target_rel_prob = likelihood(theta , data) * prior(theta)
     return target_rel_prob
+
+# Specify the data, to be used in the likelihood function.
+# This is a vector with one component per flip,
+# in which 1 means a "head" and 0 means a "tail".
+my_data = np.repeat([1, 0], [11, 3])  # 11 heads, 2 tail
 
 # Specify the length of the trajectory, i.e., the number of jumps to try:
 traj_length = 5000 # arbitrary large number

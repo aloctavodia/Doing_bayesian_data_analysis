@@ -3,14 +3,14 @@ The program described in this section was used to generate Tables 13.1 and 13.2.
 The program determines the minimal sample size needed to achieve a specified 
 goal with a specified power, when flipping a single coin.
 """
-import numpy as np
-from HDIofICDF import *
-from scipy.special import binom, betaln
-
 
 def minNforHDIpower(genPriorMean, genPriorN, HDImaxwid=None, nullVal=None,
                     ROPE=None, desiredPower=0.8, audPriorMean=0.5,
                     audPriorN=2, HDImass=0.95, initSampSize=1, verbose=True):
+    import numpy as np
+    from HDIofICDF import HDIofICDF, beta
+    from scipy.special import binom, betaln
+
     if HDImaxwid != None  and nullVal != None:
         sys.exit('One and only one of HDImaxwid and nullVal must be specified')
     if ROPE == None:
