@@ -1,7 +1,7 @@
 """
 Inferring two binomial proportions using PyMC.
 """
-from __future__ import division
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pymc3 as pm
@@ -70,6 +70,6 @@ for step_idx in range(chain_len):  # step through the chain
 # Now determine the proportion of times that y1==1 and y2==0
 pY1eq1andY2eq0 = sum((y_pred[0] ==1) & (y_pred[1] == 0)) / chain_len
 
-print pY1eq1andY2eq0
+print(pY1eq1andY2eq0)
 plt.show()
 

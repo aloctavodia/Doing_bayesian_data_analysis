@@ -1,7 +1,7 @@
 """
 Comparing models using Hierarchical modelling. Toy Model.
 """
-from __future__ import division
+
 import numpy as np
 import pymc3 as pm
 import matplotlib.pyplot as plt

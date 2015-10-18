@@ -1,7 +1,7 @@
 """
 Two way BANOVA
 """
-from __future__ import division
+
 import numpy as np
 import pymc3 as pm
 import pandas as pd
@@ -219,7 +219,7 @@ plt.savefig('Figure_19.4.png')
 ## Display contrast analyses
 plt.figure(figsize=(10, 12))
 count = 1
-for key, value in x1contrastDict.items():
+for key, value in list(x1contrastDict.items()):
     contrast = np.dot(b1_sample, value)
     plt.subplot(3, 2, count)
     plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 
@@ -227,7 +227,7 @@ for key, value in x1contrastDict.items():
                   bins=50)
     count += 1
     
-for key, value in x2contrastDict.items():
+for key, value in list(x2contrastDict.items()):
     contrast = np.dot(b2_sample, value)
     plt.subplot(3, 2, count)
     plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 
@@ -235,7 +235,7 @@ for key, value in x2contrastDict.items():
                   bins=50)
     count += 1
     
-for key, value in x1x2contrastDict.items():
+for key, value in list(x1x2contrastDict.items()):
     contrast = np.tensordot(b1b2_sample, value)
     plt.subplot(3, 2, count)
     plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 

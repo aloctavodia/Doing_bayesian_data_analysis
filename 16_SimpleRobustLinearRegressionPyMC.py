@@ -1,7 +1,7 @@
 """
 Simple Robust Linear Regression
 """
-from __future__ import division
+
 import numpy as np
 import pymc3 as pm
 from scipy.stats import t, norm

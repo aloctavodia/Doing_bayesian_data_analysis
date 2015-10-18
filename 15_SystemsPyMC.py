@@ -2,7 +2,7 @@
 Estimating the mean and standard deviation of a Gaussian likelihood with a
 hierarchical model.
 '''
-from __future__ import division
+
 import numpy as np
 import pymc3 as pm
 from scipy.stats import norm

@@ -1,7 +1,7 @@
 """
 One way BANOVA
 """
-from __future__ import division
+
 import numpy as np
 import pymc3 as pm
 import pandas as pd
@@ -129,7 +129,7 @@ nContrasts = len(contrast_dict)
 if nContrasts > 0:
     plt.figure(figsize=(20, 8))
     count = 0
-    for key, value in contrast_dict.items():
+    for key, value in list(contrast_dict.items()):
         contrast = np.dot(b_sample, value)
         plt.subplot(2, 4, count)
         plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 

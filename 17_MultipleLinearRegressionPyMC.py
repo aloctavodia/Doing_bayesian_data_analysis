@@ -1,7 +1,7 @@
 """
 Multiple linear regression
 """
-from __future__ import division
+
 import numpy as np
 import pymc3 as pm
 import pandas as pd
@@ -58,7 +58,7 @@ if dataSource == "random":
     # Random Y values generated from linear model with true parameter values:
     y = np.sum(x * beta_true[1:].T, axis=1) + beta_true[0] + norm.rvs(0, sd_true, nData)
     # Select which predictors to include
-    includeOnly = range(0, n_predictors) # default is to include all
+    includeOnly = list(range(0, n_predictors)) # default is to include all
     #x = x.iloc[includeOnly]
     predictorNames = x.columns
     n_predictors = len(predictorNames)
@@ -150,6 +150,6 @@ for x_idx in range(len(x)):
     y_HDI_lim[x_idx] = hpd(y_post_pred[x_idx])
 
 for i in range(len(x)):
-    print np.mean(y_post_pred, axis=1)[i], y_HDI_lim[i]
+    print(np.mean(y_post_pred, axis=1)[i], y_HDI_lim[i])
 
 plt.show()
