@@ -70,104 +70,104 @@ with pm.Model() as model:
 
 ## Check the results.
 burnin = 2000  # posterior samples to discard
-thin = 10  # posterior samples to discard
 
 ## Print summary for each trace
-#pm.summary(trace[burnin::thin])
-#pm.summary(trace)
+#pm.df_summary(trace[burnin:])
+#pm.df_summary(trace)
 
 ## Check for mixing and autocorrelation
-pm.autocorrplot(trace[burnin::thin], vars =[mu, kappa])
-#pm.autocorrplot(trace, vars =[mu, kappa])
+pm.autocorrplot(trace[burnin:], varnames=['mu', 'kappa'])
+#pm.autocorrplot(trace, varnames =[mu, kappa])
 
 ## Plot KDE and sampled values for each parameter.
-pm.traceplot(trace[burnin::thin])
+pm.traceplot(trace[burnin:])
 #pm.traceplot(trace)
 
 # Create arrays with the posterior sample
-theta1_sample = trace['theta'][:,0][burnin::thin]
-theta2_sample = trace['theta'][:,1][burnin::thin]
-theta3_sample = trace['theta'][:,2][burnin::thin]
-mu_sample = trace['mu'][burnin::thin]
-kappa_sample = trace['kappa'][burnin::thin]
+theta1_sample = trace['theta'][:,0][burnin:]
+theta2_sample = trace['theta'][:,1][burnin:]
+theta3_sample = trace['theta'][:,2][burnin:]
+mu_sample = trace['mu'][burnin:]
+kappa_sample = trace['kappa'][burnin:]
 
-fig = plt.figure(figsize=(12,12))
 
 # Scatter plot hyper-parameters
-plt.subplot(4, 3, 1)
-plt.scatter(mu_sample, kappa_sample, marker='o')
-plt.xlim(0,1)
-plt.xlabel(r'$\mu$')
-plt.ylabel(r'$\kappa$')
+fig, ax = plt.subplots(4, 3, figsize=(12,12))
+ax[0, 0].scatter(mu_sample, kappa_sample, marker='o', color='skyblue')
+ax[0, 0].set_xlim(0,1)
+ax[0, 0].set_xlabel(r'$\mu$')
+ax[0, 0].set_ylabel(r'$\kappa$')
 
 # Plot mu histogram
-plt.subplot(4, 3, 2)
-plot_post(mu_sample, xlab=r'$\mu$', show_mode=False, labelsize=9, framealpha=0.5)
-plt.xlim(0,1)
+#plot_post(mu_sample, xlab=r'$\mu$', show_mode=False, labelsize=9, framealpha=0.5)
+
+pm.plot_posterior(mu_sample, ax=ax[0, 1], color='skyblue')
+ax[0, 1].set_xlabel(r'$\mu$')
+ax[0, 1].set_xlim(0,1)
 
 # Plot kappa histogram
-plt.subplot(4, 3, 3)
-plot_post(kappa_sample, xlab=r'$\kappa$', show_mode=False, labelsize=9, framealpha=0.5)
+#plot_post(kappa_sample, xlab=r'$\kappa$', show_mode=False, labelsize=9, framealpha=0.5)
+pm.plot_posterior(kappa_sample, ax=ax[0, 2], color='skyblue')
+ax[0, 2].set_xlabel(r'$\kappa$')
 
 # Plot theta 1
-plt.subplot(4, 3, 4)
-plot_post(theta1_sample, xlab=r'$\theta1$', show_mode=False, labelsize=9, framealpha=0.5)
-plt.xlim(0,1)
+
+#plot_post(theta1_sample, xlab=r'$\theta1$', show_mode=False, labelsize=9, framealpha=0.5)
+pm.plot_posterior(theta1_sample, ax=ax[1, 0], color='skyblue')
+ax[1, 0].set_xlabel(r'$\theta1$')
+ax[1, 0].set_xlim(0,1)
 
 # Scatter theta 1 vs mu
-plt.subplot(4, 3, 5)
-plt.scatter(theta1_sample, mu_sample, marker='o')
-plt.xlim(0,1)
-plt.ylim(0,1)
-plt.xlabel(r'$\theta1$')
-plt.ylabel(r'$\mu$')
+ax[1, 1].scatter(theta1_sample, mu_sample, marker='o', color='skyblue')
+ax[1, 1].set_xlim(0,1)
+ax[1, 1].set_ylim(0,1)
+ax[1, 1].set_xlabel(r'$\theta1$')
+ax[1, 1].set_ylabel(r'$\mu$')
 
 # Scatter theta 1 vs kappa
-plt.subplot(4, 3, 6)
-plt.scatter(theta1_sample, kappa_sample, marker='o')
-plt.xlim(0,1)
-plt.xlabel(r'$\theta1$')
-plt.ylabel(r'$\kappa$')
+ax[1, 2].scatter(theta1_sample, kappa_sample, marker='o', color='skyblue')
+ax[1, 2].set_xlim(0,1)
+ax[1, 2].set_xlabel(r'$\theta1$')
+ax[1, 2].set_ylabel(r'$\kappa$')
 
 # Plot theta 2
-plt.subplot(4, 3, 7)
-plot_post(theta2_sample, xlab=r'$\theta2$', show_mode=False, labelsize=9, framealpha=0.5)
-plt.xlim(0,1)
+#plot_post(theta2_sample, xlab=r'$\theta2$', show_mode=False, labelsize=9, framealpha=0.5)
+pm.plot_posterior(theta2_sample, ax=ax[2, 0], color='skyblue')
+ax[2, 0].set_xlabel(r'$\theta2$')
+ax[2, 0].set_xlim(0,1)
 
 # Scatter theta 2 vs mu
-plt.subplot(4, 3, 8)
-plt.scatter(theta2_sample, mu_sample, marker='o')
-plt.xlim(0,1)
-plt.ylim(0,1)
-plt.xlabel(r'$\theta2$')
-plt.ylabel(r'$\mu$')
+ax[2, 1].scatter(theta2_sample, mu_sample, marker='o', color='skyblue')
+ax[2, 1].set_xlim(0,1)
+ax[2, 1].set_ylim(0,1)
+ax[2, 1].set_xlabel(r'$\theta2$')
+ax[2, 1].set_ylabel(r'$\mu$')
 
 # Scatter theta 2 vs kappa
-plt.subplot(4, 3, 9)
-plt.scatter(theta2_sample, kappa_sample, marker='o')
-plt.xlim(0,1)
-plt.xlabel(r'$\theta2$')
-plt.ylabel(r'$\kappa$')
+ax[2, 2].scatter(theta2_sample, kappa_sample, marker='o', color='skyblue')
+ax[2, 2].set_xlim(0,1)
+ax[2, 2].set_xlabel(r'$\theta2$')
+ax[2, 2].set_ylabel(r'$\kappa$')
 
 # Plot theta 3
-plt.subplot(4, 3, 10)
-plot_post(theta3_sample, xlab=r'$\theta3$', show_mode=False, labelsize=9, framealpha=0.5)
-plt.xlim(0,1)
+
+#plot_post(theta3_sample, xlab=r'$\theta3$', show_mode=False, labelsize=9, framealpha=0.5)
+pm.plot_posterior(theta3_sample, ax=ax[3, 0], color='skyblue')
+ax[3, 0].set_xlabel(r'$\theta3$')
+ax[3, 0].set_xlim(0,1)
 
 # Scatter theta 3 vs mu
-plt.subplot(4, 3, 11)
-plt.scatter(theta3_sample, mu_sample, marker='o')
-plt.xlim(0,1)
-plt.ylim(0,1)
-plt.xlabel(r'$\theta3$')
-plt.ylabel(r'$\mu$')
+ax[3, 1].scatter(theta3_sample, mu_sample, marker='o', color='skyblue')
+ax[3, 1].set_xlim(0,1)
+ax[3, 1].set_ylim(0,1)
+ax[3, 1].set_xlabel(r'$\theta3$')
+ax[3, 1].set_ylabel(r'$\mu$')
 
 # Scatter theta 3 vs kappa
-plt.subplot(4, 3, 12)
-plt.scatter(theta3_sample, kappa_sample, marker='o')
-plt.xlim(0,1)
-plt.xlabel(r'$\theta3$')
-plt.ylabel(r'$\kappa$')
+ax[3, 2].scatter(theta3_sample, kappa_sample, marker='o', color='skyblue')
+ax[3, 2].set_xlim(0,1)
+ax[3, 2].set_xlabel(r'$\theta3$')
+ax[3, 2].set_ylabel(r'$\kappa$')
 
 plt.tight_layout()
 plt.savefig('Figure_9.11.png')
