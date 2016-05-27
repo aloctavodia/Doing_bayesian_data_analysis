@@ -5,8 +5,6 @@ import numpy as np
 import pymc3 as pm
 import sys
 import matplotlib.pyplot as plt
-from plot_post import plot_post
-
 
 # Data
 # For each subject, specify the condition s/he was in,
@@ -34,49 +32,47 @@ with pm.Model() as model:
     theta = pm.Beta('theta', mu[condition] * kappa[condition], (1 - mu[condition]) * kappa[condition], shape=len(z))
     y = pm.Binomial('y', p=theta, n=N, observed=z)
     start = pm.find_MAP()
-    step1 = pm.Metropolis([mu])
-    step2 = pm.Metropolis([theta])
-    step3 = pm.NUTS([kappa])
-#    samplers = [pm.Metropolis([rv]) for rv in model.unobserved_RVs]
-    trace = pm.sample(10000, [step1, step2, step3], start=start, progressbar=False)
+    #step1 = pm.Metropolis([mu,theta])
+    #step2 = pm.NUTS([kappa])
+    #trace = pm.sample(10000, [step1, step2], start=start, progressbar=False)
+    step = pm.NUTS()
+    trace = pm.sample(1000, step=step, start=start, progressbar=False)
 
 ## Check the results.
-burnin = 5000  # posterior samples to discard
-thin = 10  # posterior samples to discard
+burnin = 0#5000  # posterior samples to discard
 
 ## Print summary for each trace
-#pm.summary(trace[burnin::thin])
-#pm.summary(trace)
+#pm.df_summary(trace[burnin:])
+#pm.df_summary(trace)
 
 ## Check for mixing and autocorrelation
-#pm.autocorrplot(trace, vars =[mu, kappa])
+#pm.autocorrplot(trace, varnames=['mu', 'kappa'])
 
 ## Plot KDE and sampled values for each parameter.
-#pm.traceplot(trace[burnin::thin])
+#pm.traceplot(trace[burnin:])
 pm.traceplot(trace)
 
 
 # Create arrays with the posterior sample
-mu1_sample = trace['mu'][:,0][burnin::thin]
-mu2_sample = trace['mu'][:,1][burnin::thin]
-mu3_sample = trace['mu'][:,2][burnin::thin]
-mu4_sample = trace['mu'][:,3][burnin::thin]
+mu1_sample = trace['mu'][:,0][burnin:]
+mu2_sample = trace['mu'][:,1][burnin:]
+mu3_sample = trace['mu'][:,2][burnin:]
+mu4_sample = trace['mu'][:,3][burnin:]
 
-
-fig = plt.figure(figsize=(15, 6))
 
 # Plot differences among filtrations experiments
-plt.subplot(1, 3, 1)
-plot_post((mu1_sample-mu2_sample), xlab=r'$\mu1-\mu2$', show_mode=False, comp_val=0, framealpha=0.5)
+fig, ax = plt.subplots(1, 3, figsize=(15, 6))
+pm.plot_posterior(mu1_sample-mu2_sample, ax=ax[0], color='skyblue')
+ax[0].set_xlabel(r'$\mu1-\mu2$')
 
 # Plot differences among condensation experiments
-plt.subplot(1, 3, 2)
-plot_post((mu3_sample-mu4_sample), xlab=r'$\mu3-\mu4$', show_mode=False, comp_val=0, framealpha=0.5)
+pm.plot_posterior(mu3_sample-mu4_sample, ax=ax[1], color='skyblue')
+ax[1].set_xlabel(r'$\mu3-\mu4$')
 
 # Plot differences between filtration and condensation experiments
-plt.subplot(1, 3, 3)
 a = (mu1_sample+mu2_sample)/2 - (mu3_sample+mu4_sample)/2
-plot_post(a, xlab=r'$(\mu1+\mu2)/2 - (\mu3+\mu4)/2$', show_mode=False, comp_val=0, framealpha=0.5)
+pm.plot_posterior(a, ax=ax[2], color='skyblue')
+ax[2].set_xlabel(r'$(\mu1+\mu2)/2 - (\mu3+\mu4)/2$')
 
 plt.tight_layout()
 plt.savefig('Figure_9.16.png')
