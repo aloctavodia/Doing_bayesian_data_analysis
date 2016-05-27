@@ -6,7 +6,6 @@ import pymc3 as pm
 import sys
 from scipy.stats import beta, binom
 import matplotlib.pyplot as plt
-from plot_post import plot_post
 
 
 # Data for figure 9.11

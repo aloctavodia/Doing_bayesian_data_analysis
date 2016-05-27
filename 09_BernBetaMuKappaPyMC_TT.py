@@ -5,7 +5,7 @@ import numpy as np
 import pymc3 as pm
 import sys
 import matplotlib.pyplot as plt
-from plot_post import plot_post
+
 
 ## Therapeutic touch data:
 z =  [1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4,
@@ -34,50 +34,46 @@ with pm.Model() as model:
     # define the likelihood
     y = pm.Bernoulli('y', p=theta[coin], observed=y)
 #   Generate a MCMC chain
-    start = pm.find_MAP()  # find a reasonable starting point.
-    step1 = pm.Metropolis([theta, mu])
-    step2 = pm.NUTS([kappa])
-    trace = pm.sample(10000, [step1, step2], start=start, random_seed=(123), progressbar=False)
+    trace = pm.sample(10000, step=pm.NUTS(), random_seed=(123), progressbar=False)
 
 ## Check the results.
-burnin = 2000  # posterior samples to discard
-thin = 10  # posterior samples to discard
+burnin = 100  # posterior samples to discard
 
 ## Print summary for each trace
-#pm.summary(trace[burnin::thin])
-#pm.summary(trace)
+#pm.df_summary(trace[burnin:])
+#pm.df_summary(trace)
 
 ## Check for mixing and autocorrelation
-pm.autocorrplot(trace[burnin::thin], vars =[mu, kappa])
+pm.autocorrplot(trace[burnin:], varnames=['mu', 'kappa'])
 #pm.autocorrplot(trace, vars =[mu, kappa])
 
 ## Plot KDE and sampled values for each parameter.
-pm.traceplot(trace[burnin::thin])
+pm.traceplot(trace[burnin:])
 #pm.traceplot(trace)
 
 # Create arrays with the posterior sample
-theta1_sample = trace['theta'][:,0][burnin::thin]
-theta28_sample = trace['theta'][:,27][burnin::thin]
-mu_sample = trace['mu'][burnin::thin]
-kappa_sample = trace['kappa'][burnin::thin]
-
-fig = plt.figure(figsize=(12,12))
+theta1_sample = trace['theta'][:,0][burnin:]
+theta28_sample = trace['theta'][:,27][burnin:]
+mu_sample = trace['mu'][burnin:]
+kappa_sample = trace['kappa'][burnin:]
 
 # Plot mu histogram
-plt.subplot(2, 2, 1)
-plot_post(mu_sample, xlab=r'$\mu$', show_mode=False, labelsize=9, framealpha=0.5)
+fig, ax = plt.subplots(2, 2, figsize=(12,12))
+pm.plot_posterior(mu_sample, ax=ax[0, 0], color='skyblue')
+ax[0, 0].set_xlabel(r'$\mu$')
 
 # Plot kappa histogram
-plt.subplot(2, 2, 2)
-plot_post(kappa_sample, xlab=r'$\kappa$', show_mode=False, labelsize=9, framealpha=0.5)
+pm.plot_posterior(kappa_sample, ax=ax[0, 1], color='skyblue')
+ax[0, 1].set_xlabel(r'$\kappa$')
 
 # Plot theta 1
-plt.subplot(2, 2, 3)
-plot_post(theta1_sample, xlab=r'$\theta1$', show_mode=False, labelsize=9, framealpha=0.5)
+pm.plot_posterior(theta1_sample, ax=ax[1, 0], color='skyblue')
+ax[1, 0].set_xlabel(r'$\theta1$')
 
 # Plot theta 28
-plt.subplot(2, 2, 4)
-plot_post(theta28_sample, xlab=r'$\theta28$', show_mode=False, labelsize=9, framealpha=0.5)
+pm.plot_posterior(theta1_sample, ax=ax[1, 1], color='skyblue')
+ax[1, 1].set_xlabel(r'$\theta28$')
+
 
 plt.tight_layout()
 plt.savefig('Figure_9.14.png')
