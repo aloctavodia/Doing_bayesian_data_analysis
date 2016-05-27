@@ -5,7 +5,7 @@ from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
 import pymc3 as pm
-from plot_post import plot_post
+
 
 # Generate the data
 y1 = np.array([1, 1, 1, 1, 1, 0, 0])  # 5 heads and 2 tails
@@ -33,7 +33,7 @@ theta1_sample = trace['theta1']
 theta2_sample = trace['theta2']
 
 # Plot the trajectory of the last 500 sampled values.
-plt.plot(theta1_sample[:-500], theta2_sample[:-500], marker='o')
+plt.plot(theta1_sample[:-500], theta2_sample[:-500], marker='o',  color='skyblue')
 plt.xlim(0, 1)
 plt.ylim(0, 1)
 plt.xlabel(r'$\theta1$')
@@ -46,11 +46,10 @@ plt.legend(loc='upper left')
 plt.savefig('Figure_8.6.png')
 
 # Plot a histogram of the posterior differences of theta values.
-plt.figure()
 theta_diff = theta1_sample - theta2_sample
-plot_post(theta_diff, xlab=r'$\theta_1 - \theta_2$', comp_val=0.0, show_mode=False, bins=30)
+pm.plot_posterior(theta_diff, ref_val=0.0, bins=30, color='skyblue')
+plt.xlabel(r'$\theta_1 - \theta_2$')
 plt.savefig('Figure_8.8.png')
-
 
 # For Exercise 8.5:
 # Posterior prediction. For each step in the chain, use the posterior thetas 
@@ -70,6 +69,6 @@ for step_idx in range(chain_len):  # step through the chain
 # Now determine the proportion of times that y1==1 and y2==0
 pY1eq1andY2eq0 = sum((y_pred[0] ==1) & (y_pred[1] == 0)) / chain_len
 
-print pY1eq1andY2eq0
+print(pY1eq1andY2eq0)
 plt.show()
 
