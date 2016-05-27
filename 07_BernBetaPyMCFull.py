@@ -4,7 +4,6 @@ Inferring a binomial proportion using PyMC.
 import matplotlib.pyplot as plt
 import numpy as np
 import pymc3 as pm
-from plot_post import *
 
 # Generate the data
 y = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0])  # 11 heads and 3 tails
@@ -26,16 +25,14 @@ with pm.Model() as model:
 # create an array with the posterior sample
 theta_sample = trace['theta']
 
-print theta_sample
+fig, ax = plt.subplots(1, 2)
+ax[0].plot(theta_sample[:500], np.arange(500), marker='o', color='skyblue')
+ax[0].set_xlim(0, 1)
+ax[0].set_xlabel(r'$\theta$')
+ax[0].set_ylabel('Position in Chain')
 
-plt.subplot(1, 2, 1)
-plt.plot(theta_sample[:500], np.arange(500), marker='o')
-plt.xlim(0, 1)
-plt.xlabel(r'$\theta$')
-plt.ylabel('Position in Chain')
-
-plt.subplot(1, 2, 2)
-mcmc_info = plot_post(theta_sample, xlab=r'$\theta', show_mode=False)
+pm.plot_posterior(theta_sample, ax=ax[1], color='skyblue');
+ax[1].set_xlabel(r'$\theta$');
 
 # Posterior prediction:
 # For each step in the chain, use posterior theta to flip a coin:
