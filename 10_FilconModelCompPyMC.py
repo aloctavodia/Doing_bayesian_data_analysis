@@ -42,11 +42,11 @@ with pm.Model() as model:
     # Hyperprior on mu and kappa:
     mu = pm.Beta('mu', 1, 1, shape=n_cond)
 
-    kappa0 = pm.Gamma('kappa0', shape_Gamma, rate_Gamma)
+    kappa0 = pm.Gamma('kappa0', alpha=shape_Gamma, beta=rate_Gamma)
     a_Beta0 = mu[cond_of_subj] * kappa0
     b_Beta0 = (1 - mu[cond_of_subj]) * kappa0
 
-    kappa1 = pm.Gamma('kappa1', shape_Gamma, rate_Gamma, shape=n_cond)
+    kappa1 = pm.Gamma('kappa1', alpha=shape_Gamma, beta=rate_Gamma, shape=n_cond)
     a_Beta1 = mu[cond_of_subj] * kappa1[cond_of_subj]
     b_Beta1 = (1 - mu[cond_of_subj]) * kappa1[cond_of_subj]
 
@@ -60,16 +60,17 @@ with pm.Model() as model:
     y = pm.Binomial('y', p=theta, n=n_trl_of_subj, observed=n_corr_of_subj)
 
     # Sampling
-    start = pm.find_MAP()
-    steps = [pm.Metropolis([i]) for i in model.unobserved_RVs[1:]]
-    steps.append(pm.ElemwiseCategoricalStep(var=model_index,values=[0,1]))
-    trace = pm.sample(50000, steps, start=start, progressbar=False)
+    step1 = pm.Metropolis([kappa0, kappa1, mu])
+    step2 = pm.NUTS([theta0, theta1])
+    step3 = pm.ElemwiseCategorical(vars=[model_index],values=[0,1])
+    trace = pm.sample(5000, step=[step1, step2, step3], progressbar=False)
 
 
 # EXAMINE THE RESULTS.
-burnin = 1000
-thin = 1
-model_idx_sample = trace['model_index'][burnin::thin]
+burnin = 500
+pm.traceplot(trace)
+
+model_idx_sample = trace['model_index'][burnin:]
 
 pM1 = sum(model_idx_sample == 1) / len(model_idx_sample)
 pM2 = 1 - pM1
@@ -77,20 +78,20 @@ pM2 = 1 - pM1
 plt.figure(figsize=(15, 15))
 plt.subplot2grid((5,4), (0,0), colspan=4)
 plt.plot(model_idx_sample, label='p(M1|D) = %.3f ; p(M2|D) = %.3f' % (pM1, pM2));
-plt.xlabel('Step in Markov Chain')
+plt.xlabel('Steps in Markov Chain')
 plt.legend(loc='upper right', framealpha=0.75)
 
 for m in range(0, 2):
-    kappa0_sample = trace['kappa0'][burnin::thin][model_idx_sample == m]
+    kappa0_sample = trace['kappa0'][burnin:][model_idx_sample == m]
     plt.subplot2grid((5,4), (3+m, 1), colspan=2)
-    plt.hist(kappa0_sample, bins=20)
+    plt.hist(kappa0_sample, bins=30)
     plt.title(r'Post. $\kappa_0$ for M=%s' % (m+1), fontsize=14)
     plt.xlabel(r'$\kappa_0$')
     plt.xlim(0, 30)
     for i in range(0, 4):
-        kappa1_sample = trace['kappa1'][:,i][burnin::thin][model_idx_sample == m]
+        kappa1_sample = trace['kappa1'][:,i][burnin:][model_idx_sample == m]
         plt.subplot2grid((5,4), (m+1, i))
-        plt.hist(kappa1_sample)
+        plt.hist(kappa1_sample, bins=30)
         plt.title(r'Post. $\kappa_%s$ for M=%s' % (i+1, m+1), fontsize=14)
         plt.xlabel(r'$\kappa_%s$' % (i+1))
         plt.xlim(0, 30)
