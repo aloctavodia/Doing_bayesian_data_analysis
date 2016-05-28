@@ -8,9 +8,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from plot_post import plot_post
-from hpd import * 
-import seaborn as sns
-from theano import tensor as T
+import seaborn as sns  # optional
+from theano import tensor as tt
 
 
 # THE DATA.
@@ -117,15 +116,15 @@ z = (y - np.mean(y))/np.std(y)
 
 with pm.Model() as model:
     # define the hyperpriors
-    a1_SD_unabs = pm.T('a1_SD_unabs', mu=0, lam=0.001, nu=1)
+    a1_SD_unabs = pm.StudentT('a1_SD_unabs', mu=0, lam=0.001, nu=1)
     a1_SD = abs(a1_SD_unabs) + 0.1
     a1tau = 1 / a1_SD**2
 
-    a2_SD_unabs = pm.T('a2_SD_unabs', mu=0, lam=0.001, nu=1)
+    a2_SD_unabs = pm.StudentT('a2_SD_unabs', mu=0, lam=0.001, nu=1)
     a2_SD = abs(a2_SD_unabs) + 0.1
     a2tau = 1 / a2_SD**2
     
-    a1a2_SD_unabs = pm.T('a1a2_SD_unabs', mu=0, lam=0.001, nu=1)
+    a1a2_SD_unabs = pm.StudentT('a1a2_SD_unabs', mu=0, lam=0.001, nu=1)
     a1a2_SD = abs(a1a2_SD_unabs) + 0.1
     a1a2tau = 1 / a1a2_SD**2
 
@@ -140,9 +139,9 @@ with pm.Model() as model:
     a2 = pm.Normal('a2', mu=0 , tau=a2tau, shape=Nx2Lvl)
     a1a2 = pm.Normal('a1a2', mu=0 , tau=a1a2tau, shape=[Nx1Lvl, Nx2Lvl])
 
-    b1 = pm.Deterministic('b1', a1 - T.mean(a1))
-    b2 = pm.Deterministic('b2', a2 - T.mean(a2))
-    b1b2 = pm.Deterministic('b1b2', a1a2 - T.mean(a1a2))
+    b1 = pm.Deterministic('b1', a1 - tt.mean(a1))
+    b2 = pm.Deterministic('b2', a2 - tt.mean(a2))
+    b1b2 = pm.Deterministic('b1b2', a1a2 - tt.mean(a1a2))
     
     mu = a0 + b1[x1] + b2[x2] + b1b2[x1, x2]
  
@@ -152,29 +151,28 @@ with pm.Model() as model:
     # Generate a MCMC chain
     start = pm.find_MAP()
     steps = pm.Metropolis()
-    trace = pm.sample(20000, steps, start=start, progressbar=True)
+    trace = pm.sample(20000, steps, start=start, progressbar=False)
 
 # EXAMINE THE RESULTS
 burnin = 2000
-thin = 50
 
 # Print summary for each trace
-#pm.summary(trace[burnin::thin])
+#pm.summary(trace[burnin:])
 #pm.summary(trace)
 
 # Check for mixing and autocorrelation
-#pm.autocorrplot(trace[burnin::thin], vars=model.unobserved_RVs[:-1])
+#pm.autocorrplot(trace[burnin:], vars=model.unobserved_RVs[:-1])
 
 ## Plot KDE and sampled values for each parameter.
-pm.traceplot(trace[burnin::thin])
+pm.traceplot(trace[burnin:])
 #pm.traceplot(trace)
 
 
 # Extract values of 'a'
-a0_sample = trace['a0'][burnin::thin]
-b1_sample = trace['b1'][burnin::thin]
-b2_sample = trace['b2'][burnin::thin]
-b1b2_sample = trace['b1b2'][burnin::thin]
+a0_sample = trace['a0'][burnin:]
+b1_sample = trace['b1'][burnin:]
+b2_sample = trace['b2'][burnin:]
+b1b2_sample = trace['b1b2'][burnin:]
 
 b0_sample = a0_sample * np.std(y) + np.mean(y)
 b1_sample = b1_sample * np.std(y)

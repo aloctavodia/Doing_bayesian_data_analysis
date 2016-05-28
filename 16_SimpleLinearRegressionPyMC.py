@@ -58,7 +58,7 @@ thin = 10
 #pm.autocorrplot(trace, vars =[tau])
 
 ## Plot KDE and sampled values for each parameter.
-#pm.traceplot(trace[burnin::thin])
+pm.traceplot(trace[burnin::thin])
 #pm.traceplot(trace)
 
 ## Extract chain values:
