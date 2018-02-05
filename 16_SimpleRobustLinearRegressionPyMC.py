@@ -7,10 +7,9 @@ import pymc3 as pm
 from scipy.stats import t, norm
 from scipy.interpolate import spline
 import matplotlib.pyplot as plt
-from plot_post import plot_post
+plt.style.use('seaborn-darkgrid')
 from hpd import *
 from HtWtDataGenerator import *
-import seaborn as sns
 
 
 # THE DATA.
@@ -35,45 +34,36 @@ tdf_gain = 1 # 1 for low-baised tdf, 100 for high-biased tdf
 # THE MODEL
 with pm.Model() as model:
     # define the priors
-    udf = pm.Uniform('udf', 0, 1)
-    tdf = 1 - tdf_gain * pm.log(1 - udf) # tdf in [1,Inf).
-    tau = pm.Gamma('tau', 0.001, 0.001)
-    beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
-    beta1 = pm.Normal('beta1', mu=0, tau=1.0E-12)
+    tdf = pm.Exponential('tdf', 1/30.)
+    sd = pm.HalfNormal('sd', 25)
+    beta0 = pm.Normal('beta0', mu=0, sd=100)
+    beta1 = pm.Normal('beta1', mu=0, sd=100)
     mu = beta0 + beta1 * zx
     # define the likelihood
-    yl = pm.T('yl', mu=mu, lam=tau, nu=tdf, observed=zy)
+    yl = pm.StudentT('yl', mu=mu, sd=sd, nu=tdf, observed=zy)
     # Generate a MCMC chain
-    start = pm.find_MAP()
-    step = pm.Metropolis()
-    trace = pm.sample(20000, step, start, progressbar=False)
+    trace = pm.sample(2000)
 
 
 # EXAMINE THE RESULTS
-burnin = 1000
-thin = 10
 
 ## Print summary for each trace
-#pm.summary(trace[burnin::thin])
 #pm.summary(trace)
 
 ## Check for mixing and autocorrelation
-#pm.autocorrplot(trace[burnin::thin], vars =[tau])
 #pm.autocorrplot(trace, vars =[tau])
 
 ## Plot KDE and sampled values for each parameter.
-#pm.traceplot(trace[burnin::thin])
 #pm.traceplot(trace)
 
 
 # Extract chain values:
 
-tdf_samp = 1 - tdf_gain * np.log(1 - trace['udf'][burnin::thin])
+tdf_samp = trace['tdf']
 tdf_m = np.mean(tdf_samp)
-z0 = trace["beta0"][burnin::thin]
-z1 = trace["beta1"][burnin::thin]
-z_tau = trace["tau"][burnin::thin]
-z_sigma = 1 / np.sqrt(z_tau) # Convert precision to SD
+z0 = trace["beta0"] 
+z1 = trace["beta1"] 
+z_sigma = trace["sd"] 
 
 # Convert to original scale:
 b1 = z1 * y_sd / x_sd
@@ -115,9 +105,8 @@ plt.xlabel("Slope")
 plt.savefig('Figure_16.x0.png')
 
 # Display the posterior of the b1:
-plt.figure()
-plot_post(b1, xlab=r'Slope ($\Delta$ tar  / $\Delta$ weight)', comp_val=0.0,
-            show_mode=False, bins=30)
+ax = pm.plot_posterior(b1, ref_val=0.0, bins=30)
+ax.set_xlabel(r'Slope ($\Delta$ tar  / $\Delta$ weight)')
 plt.title('Mean tdf = %.2f' % tdf_m)
 plt.savefig('Figure_16.8b.png')
 

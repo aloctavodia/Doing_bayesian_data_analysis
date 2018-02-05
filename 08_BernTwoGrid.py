@@ -3,6 +3,7 @@ Inferring two binomial proportions via grid aproximation.
 """
 from __future__ import division
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from scipy.stats import beta
 from HDI_of_grid import HDI_of_grid
