@@ -6,6 +6,7 @@ from __future__ import division
 import numpy as np
 from scipy.stats import beta
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 
 
 # Define the likelihood function.
@@ -50,7 +51,7 @@ trajectory = np.zeros((traj_length, 2))
 # Specify where to start the trajectory
 trajectory[0, ] = [0.50, 0.50] # arbitrary start values of the two param's
 # Specify the burn-in period.
-burn_in = np.ceil(.1 * traj_length) # arbitrary number
+burn_in = int(np.ceil(.1 * traj_length)) # arbitrary number
 # Initialize accepted, rejected counters, just to monitor performance.
 n_accepted = 0
 n_rejected = 0
@@ -149,7 +150,7 @@ waterline = np.percentile(post_prob, (credmass))
 HDI_points = accepted_traj[post_prob > waterline, ]
 
 plt.figure()
-plt.plot(HDI_points[:,0], HDI_points[:,1], 'ro')
+plt.plot(HDI_points[:,0], HDI_points[:,1], 'C1o')
 plt.xlim(0,1)
 plt.ylim(0,1)
 plt.xlabel(r'$\theta1$')

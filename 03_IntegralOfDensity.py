@@ -2,6 +2,7 @@
 Graph of normal probability density function, with comb of intervals.
 """
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 import numpy as np
 
 meanval = 0.0              # Specify mean of distribution.

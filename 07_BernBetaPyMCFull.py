@@ -2,6 +2,7 @@
 Inferring a binomial proportion using PyMC.
 """
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 import numpy as np
 import pymc3 as pm
 
@@ -11,16 +12,13 @@ y = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0])  # 11 heads and 3 tails
 
 with pm.Model() as model:
     # define the prior
-    theta = pm.Beta('theta', 1, 1)  # prior
+    theta = pm.Beta('theta', 1., 1.)  # prior
     # define the likelihood
     y = pm.Bernoulli('y', p=theta, observed=y)
 
     # Generate a MCMC chain
-    trace = pm.sample(5000, pm.Metropolis(),
-                      progressbar=False)  # Use Metropolis sampling
-#    start = pm.find_MAP()  # Find starting value by optimization
-#    step = pm.NUTS()  # Instantiate NUTS sampler
-#    trace = pm.sample(5000, step, start=start, progressbar=False)
+    trace = pm.sample(1000)
+
 
 # create an array with the posterior sample
 theta_sample = trace['theta']
@@ -45,7 +43,7 @@ y_pred_jittered = y_pred + np.random.uniform(-.05, .05, size=len(theta_sample))
 
 # Now plot the jittered values:
 plt.figure()
-plt.plot(theta_sample[:500], y_pred_jittered[:500], 'ro')
+plt.plot(theta_sample[:500], y_pred_jittered[:500], 'C1o')
 plt.xlim(-.1, 1.1)
 plt.ylim(-.1, 1.1)
 plt.xlabel(r'$\theta$')

@@ -6,6 +6,7 @@ import numpy as np
 from scipy.stats import beta
 from scipy.special import beta as beta_func
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 from HDIofICDF import *
 
 

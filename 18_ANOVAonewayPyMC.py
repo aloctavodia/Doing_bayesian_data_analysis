@@ -6,10 +6,9 @@ import numpy as np
 import pymc3 as pm
 import pandas as pd
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 from scipy.stats import norm
-from plot_post import plot_post
 from hpd import * 
-import seaborn as sns
 from theano import tensor as T
 
 
@@ -75,7 +74,7 @@ z = (y - np.mean(y))/np.std(y)
 ## THE MODEL.
 with pm.Model() as model:
     # define the hyperpriors
-    a_SD_unabs = pm.T('a_SD_unabs', mu=0, lam=0.001, nu=1)
+    a_SD_unabs = pm.StudentT('a_SD_unabs', mu=0, lam=0.001, nu=1)
     a_SD = abs(a_SD_unabs) + 0.1
     atau = 1 / a_SD**2
     # define the priors
@@ -89,9 +88,7 @@ with pm.Model() as model:
     # define the likelihood
     yl = pm.Normal('yl', mu, tau=tau, observed=z)
     # Generate a MCMC chain
-    start = pm.find_MAP()
-    steps = pm.Metropolis()
-    trace = pm.sample(20000, steps, start, progressbar=False)
+    trace = pm.sample(2000,  progressbar=False)
 
 
 # EXAMINE THE RESULTS
@@ -117,10 +114,10 @@ b_sample = b_sample * np.std(y)
 
 plt.figure(figsize=(20, 4))
 for i in range(5):
-    plt.subplot(1, 5, i+1)
-    plot_post(b_sample[:,i], xlab=r'$\beta1_{%s}$' % i,
-              show_mode=False, framealpha=0.5,
-              bins=50, title='x:%s' % i)
+    ax = plt.subplot(1, 5, i+1)
+    pm.plot_posterior(b_sample[:,i], bins=50, ax=ax)
+    ax.set_xlabel(r'$\beta1_{}$'.format(i))
+    ax.set_title('x:{}'.format(i))
 plt.tight_layout()
 plt.savefig('Figure_18.2a.png')
 
@@ -128,13 +125,12 @@ plt.savefig('Figure_18.2a.png')
 nContrasts = len(contrast_dict)
 if nContrasts > 0:
     plt.figure(figsize=(20, 8))
-    count = 0
+    count = 1
     for key, value in contrast_dict.items():
         contrast = np.dot(b_sample, value)
-        plt.subplot(2, 4, count)
-        plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 
-                  show_mode=False, framealpha=0.5, 
-                  bins=50)
+        ax = plt.subplot(2, 4, count)
+        pm.plot_posterior(contrast, ref_val=0.0, bins=50, ax=ax)
+        ax.set_title('Contrast {}'.format(key))
         count += 1
     plt.tight_layout()
     plt.savefig('Figure_18.2b.png')

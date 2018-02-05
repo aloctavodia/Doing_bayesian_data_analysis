@@ -7,9 +7,10 @@ import pymc3 as pm
 import pandas as pd
 from scipy.stats import norm
 import matplotlib.pyplot as plt
-from plot_post import plot_post
-from hpd import *
+plt.style.use('seaborn-darkgrid')
 import seaborn as sns
+from hpd import *
+
 
 
 # THE DATA.
@@ -70,46 +71,38 @@ if dataSource == "random":
 # THE MODEL
 with pm.Model() as model:
     # define hyperpriors
-    muB = pm.Normal('muB', 0,.100 )
+    muB = pm.Normal('muB', 0, 100)
     tauB = pm.Gamma('tauB', .01, .01)
     udfB = pm.Uniform('udfB', 0, 1)
-    tdfB = 1 + tdfBgain * (-pm.log(1 - udfB))
+    tdfB = 1 + tdfBgain * (-pm.math.log(1 - udfB))
     # define the priors
     tau = pm.Gamma('tau', 0.01, 0.01)
     beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
-    beta1 = pm.T('beta1', mu=muB, lam=tauB, nu=tdfB, shape=n_predictors)
-    mu = beta0 + pm.dot(beta1, x.values.T)
+    beta1 = pm.StudentT('beta1', mu=muB, lam=tauB, nu=tdfB, shape=n_predictors)
+    mu = beta0 + pm.math.dot(beta1, x.values.T)
     # define the likelihood
     #mu = beta0 + beta1[0] * x.values[:,0] + beta1[1] * x.values[:,1]
     yl = pm.Normal('yl', mu=mu, tau=tau, observed=y)
     # Generate a MCMC chain
-    start = pm.find_MAP()
-    step1 = pm.NUTS([beta1])
-    step2 = pm.Metropolis([beta0, tau, muB, tauB, udfB])
-    trace = pm.sample(10000, [step1, step2], start, progressbar=False)
+    trace = pm.sample(1000)
 
 
 # EXAMINE THE RESULTS
-burnin = 2000
-thin = 1
 
 # Print summary for each trace
-#pm.summary(trace[burnin::thin])
 #pm.summary(trace)
 
 # Check for mixing and autocorrelation
-#pm.autocorrplot(trace[burnin::thin], vars =[mu, tau])
 #pm.autocorrplot(trace, vars =[beta0])
 
 ## Plot KDE and sampled values for each parameter.
-#pm.traceplot(trace[burnin::thin])
 #pm.traceplot(trace)
 
 
 # Extract chain values:
-b0_samp = trace['beta0'][burnin::thin]
-b_samp = trace['beta1'][burnin::thin]
-tau_samp = trace['tau'][burnin::thin]
+b0_samp = trace['beta0']
+b_samp = trace['beta1']
+tau_samp = trace['tau']
 sigma_samp = 1 / np.sqrt(tau_samp) # Convert precision to SD
 chain_length = len(tau_samp)
 
@@ -120,24 +113,24 @@ columns = ['Sigma y', 'Intercept']
 [columns.append('Slope_%s' % i) for i in predictor_names[:n_predictors]]
 traces = np.array([sigma_samp, b0_samp, b_samp[:,0], b_samp[:,1]]).T
 df = pd.DataFrame(traces, columns=columns)
-sns.set_style('dark')
 g = sns.PairGrid(df)
 g.map(plt.scatter)
 plt.savefig('Figure_17.Xa.png')
 
 ## Display the posterior:
-sns.set_style('darkgrid')
 
 plt.figure(figsize=(16,4))
-plt.subplot(1, n_predictors+2, 1)
-plot_post(sigma_samp, xlab=r'$\sigma y$', show_mode=False, framealpha=0.5)
-plt.subplot(1, n_predictors+2, 2)
-plot_post(b0_samp, xlab='Intercept', show_mode=False, framealpha=0.5)
+ax = plt.subplot(1, n_predictors+2, 1)
+pm.plot_posterior(sigma_samp, ax=ax)
+ax.set_xlabel(r'$\sigma y$')
+ax = plt.subplot(1, n_predictors+2, 2)
+pm.plot_posterior(b0_samp, ax=ax)
+ax.set_xlabel('Intercept')
 
 for i in range(0, n_predictors):
-    plt.subplot(1, n_predictors+2, 3+i)
-    plot_post(b_samp[:,i], xlab='Slope_%s' % predictor_names[i],
-              show_mode=False, framealpha=0.5, comp_val=0)
+    ax = plt.subplot(1, n_predictors+2, 3+i)
+    pm.plot_posterior(b_samp[:,i], ref_val=0, ax=ax)
+    ax.set_xlabel('Slope_%s' % predictor_names[i])
 plt.tight_layout()
 plt.savefig('Figure_17.Xb.png')
 
@@ -158,6 +151,6 @@ for x_idx in range(len(x)):
     y_HDI_lim[x_idx] = hpd(y_post_pred[x_idx])
 
 for i in range(len(x)):
-    print np.mean(y_post_pred, axis=1)[i], y_HDI_lim[i]
+    print(np.mean(y_post_pred, axis=1)[i], y_HDI_lim[i])
 
 plt.show()

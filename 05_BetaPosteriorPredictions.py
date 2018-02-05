@@ -6,6 +6,7 @@ simulating data sampled from the winning model and see if the simulated data
 import numpy as np
 from scipy.stats import beta
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 
 # Specify known values of prior and actual data.
 prior_a = 100

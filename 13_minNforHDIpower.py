@@ -45,7 +45,7 @@ def minNforHDIpower(genPriorMean, genPriorN, HDImaxwid=None, nullVal=None,
             powerHDI = np.sum(pzvec[(hdiMat[:,0] > ROPE[1]) | 
                                     (hdiMat[:,1] < ROPE[0])])
         if verbose:
-            print " For sample size = %s\npower = %s\n" % (sampleSize, powerHDI)
+            print(" For sample size = %s\npower = %s\n" % (sampleSize, powerHDI))
 
         if powerHDI > desiredPower:
             break
@@ -53,6 +53,6 @@ def minNforHDIpower(genPriorMean, genPriorN, HDImaxwid=None, nullVal=None,
             sampleSize += 1
     return sampleSize
 
-print minNforHDIpower(genPriorMean=.85 , genPriorN=2000 , nullVal=0.5, verbose=False)
-#print minNforHDIpower(genPriorMean=.85 , genPriorN=10 , HDImaxwid=0.2, verbose=False)
+print(minNforHDIpower(genPriorMean=.85 , genPriorN=2000 , nullVal=0.5, verbose=False))
+#print(minNforHDIpower(genPriorMean=.85 , genPriorN=10 , HDImaxwid=0.2, verbose=False))
 

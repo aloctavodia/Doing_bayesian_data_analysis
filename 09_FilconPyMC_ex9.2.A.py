@@ -6,6 +6,7 @@ import numpy as np
 import pymc3 as pm
 import sys
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 
 
 # Data
@@ -36,27 +37,24 @@ with pm.Model() as model:
     theta = pm.Beta('theta', mu[condition] * kappa, (1 - mu[condition]) * kappa, shape=len(z))
     # define the likelihood
     y = pm.Binomial('y', p=theta, n=N, observed=z)
-    trace = pm.sample(5000, step=pm.NUTS(), progressbar=False)
+    trace = pm.sample(1000)
 
 ## Check the results.
-burnin = 0  # posterior samples to discard
 
 ## Print summary for each trace
-#pm.df_summary(trace[burnin:])
 #pm.df_summary(trace)
 
 ## Check for mixing and autocorrelation
 #pm.autocorrplot(trace, varnames=['mu', 'kappa'])
 
 ## Plot KDE and sampled values for each parameter.
-#pm.traceplot(trace[burnin:])
 pm.traceplot(trace)
 
 # Create arrays with the posterior sample
-mu1_sample = trace['mu'][:,0][burnin:]
-mu2_sample = trace['mu'][:,1][burnin:]
-mu3_sample = trace['mu'][:,2][burnin:]
-mu4_sample = trace['mu'][:,3][burnin:]
+mu1_sample = trace['mu'][:,0]
+mu2_sample = trace['mu'][:,1]
+mu3_sample = trace['mu'][:,2]
+mu4_sample = trace['mu'][:,3]
 
 
 # Plot differences among filtrations experiments

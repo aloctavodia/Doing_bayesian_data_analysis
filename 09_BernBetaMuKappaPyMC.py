@@ -6,6 +6,7 @@ import pymc3 as pm
 import sys
 from scipy.stats import beta, binom
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 
 
 # Data for figure 9.11
@@ -48,46 +49,30 @@ with pm.Model() as model:
     y = pm.Bernoulli('y', p=theta[coin], observed=y)
 
 #   Generate a MCMC chain
-    step = pm.Metropolis()
-    trace = pm.sample(5000, step, progressbar=False)
-#   Restricted models like this could be difficult to sample. This is related 
-#   to the censoring comment in the book. One way to detect that something is 
-#   wrong with the sampling is to compare the autocorrelation plot and the 
-#   sampled values under different sampler, or you can try combinations of 
-#   sampler like this
 
-#    step1 = pm.Metropolis([theta, mu])
-#    step2 = pm.Slice([kappa])
-#    trace = pm.sample(5000, [step1, step2], progressbar=False)
+    trace = pm.sample(1000, progressbar=False)
 
-#    or this (this combination was used to generate the figures)
-
-#    start = pm.find_MAP()
-#    step1 = pm.Metropolis([theta, mu])
-#    step2 = pm.NUTS([kappa])
-#    trace = pm.sample(5000, [step1, step2], start=start, progressbar=False)
 
 ## Check the results.
-burnin = 2000  # posterior samples to discard
 
 ## Print summary for each trace
-#pm.df_summary(trace[burnin:])
+#pm.df_summary(trace)
 #pm.df_summary(trace)
 
 ## Check for mixing and autocorrelation
-pm.autocorrplot(trace[burnin:], varnames=['mu', 'kappa'])
+pm.autocorrplot(trace, varnames=['mu', 'kappa'])
 #pm.autocorrplot(trace, varnames =[mu, kappa])
 
 ## Plot KDE and sampled values for each parameter.
-pm.traceplot(trace[burnin:])
+pm.traceplot(trace)
 #pm.traceplot(trace)
 
 # Create arrays with the posterior sample
-theta1_sample = trace['theta'][:,0][burnin:]
-theta2_sample = trace['theta'][:,1][burnin:]
-theta3_sample = trace['theta'][:,2][burnin:]
-mu_sample = trace['mu'][burnin:]
-kappa_sample = trace['kappa'][burnin:]
+theta1_sample = trace['theta'][:,0]
+theta2_sample = trace['theta'][:,1]
+theta3_sample = trace['theta'][:,2]
+mu_sample = trace['mu']
+kappa_sample = trace['kappa']
 
 
 # Scatter plot hyper-parameters

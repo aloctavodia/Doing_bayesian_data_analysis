@@ -3,6 +3,7 @@ Inferring two binomial proportions using PyMC.
 """
 from __future__ import division
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 import numpy as np
 import pymc3 as pm
 
@@ -21,12 +22,7 @@ with pm.Model() as model:
     y2 = pm.Bernoulli('y2', p=theta2, observed=y2)
 
     # Generate a MCMC chain
-    start = pm.find_MAP()  # Find starting value by optimization
-    trace = pm.sample(10000, pm.Metropolis(),
-                      progressbar=False)  # Use Metropolis sampling
-#    start = pm.find_MAP()  # Find starting value by optimization
-#    step = pm.NUTS()  # Instantiate NUTS sampler
-#    trace = pm.sample(10000, step, start=start, progressbar=False)
+    trace = pm.sample(1000)
 
 # create an array with the posterior sample
 theta1_sample = trace['theta1']

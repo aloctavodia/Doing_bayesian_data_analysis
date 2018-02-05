@@ -5,11 +5,8 @@ hierarchical model.
 from __future__ import division
 import numpy as np
 import pymc3 as pm
-from scipy.stats import norm
 import matplotlib.pyplot as plt
-from plot_post import plot_post
-import seaborn as sns
-
+plt.style.use('seaborn-darkgrid')
 
 # THE DATA.
 # Load the aircraft data:
@@ -37,46 +34,39 @@ with pm.Model() as model:
     # define the likelihood
     y = pm.Normal('y', mu=mu[subj-1], tau=tau[subj-1], observed=y)
     # Generate a MCMC chain
-    #start = pm.find_MAP()
-    #step = pm.Metropolis()
-    step = pm.Metropolis()
-    trace = pm.sample(20000, step, progressbar=False)
+    trace = pm.sample(2000)
 
 
 # EXAMINE THE RESULTS
-burnin = 5000
-thin = 100
 
 
 ## Print summary for each trace
-#pm.summary(trace[burnin::thin])
 #pm.summary(trace)
 
 ## Check for mixing and autocorrelation
-#pm.autocorrplot(trace[burnin::thin], vars =[mu, tau])
 #pm.autocorrplot(trace, vars =[mu, tau])
 
 ## Plot KDE and sampled values for each parameter.
-#pm.traceplot(trace[burnin::thin])
 #pm.traceplot(trace)
 
 
 ## Extract chains
-muG_sample = trace['muG'][burnin::thin]
-tauG_sample = trace['tauG'][burnin::thin]
-m_sample = trace['m'][burnin::thin]
-d_sample = trace['d'][burnin::thin]
+muG_sample = trace['muG']
+tauG_sample = trace['tauG']
+m_sample = trace['m']
+d_sample = trace['d']
 
 # Plot the hyperdistributions:
-plt.figure(figsize=(20, 5))
-plt.subplot(1, 4, 1)
-plot_post(muG_sample, xlab=r'$\mu_g$', bins=30, show_mode=False)
-plt.subplot(1, 4, 2)
-plot_post(tauG_sample, xlab=r'$\tau_g$', bins=30, show_mode=False)
-plt.subplot(1, 4, 3)
-plot_post(m_sample, xlab='m', bins=30, show_mode=False)
-plt.subplot(1, 4, 4)
-plot_post(d_sample, xlab='d', bins=30, show_mode=False)
+_, ax = plt.subplots(1, 4, figsize=(20, 5))
+pm.plot_posterior(muG_sample, bins=30, ax=ax[0])
+ax[0].set_xlabel(r'$\mu_g$', fontsize=16)
+pm.plot_posterior(tauG_sample, bins=30 ,ax=ax[1])
+ax[1].set_xlabel(r'$\tau_g$', fontsize=16)
+pm.plot_posterior(m_sample, bins=30, ax=ax[2])
+ax[2].set_xlabel('m', fontsize=16)
+pm.plot_posterior(d_sample, bins=30, ax=ax[3])
+ax[3].set_xlabel('d', fontsize=16)
 
+plt.tight_layout()
 plt.savefig('Figure_15.9.png')
 plt.show()

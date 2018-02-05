@@ -6,6 +6,7 @@ import numpy as np
 import pymc3 as pm
 import sys
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 
 # Data
 # For each subject, specify the condition s/he was in,
@@ -40,7 +41,7 @@ with pm.Model() as model:
     theta = pm.Beta('theta', mu[condition] * kappa, (1 - mu[condition]) * kappa, shape=len(z))
     # define the likelihood
     y = pm.Binomial('y', p=theta, n=N, observed=z)
-    trace = pm.sample(5000, progressbar=False)
+    trace = pm.sample(2000, tune=1000)
 
 ## Check the results.
 burnin = 0  # posterior samples to discard

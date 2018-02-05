@@ -5,6 +5,7 @@ import numpy as np
 import pymc3 as pm
 import sys
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 
 
 ## Therapeutic touch data:
@@ -34,28 +35,25 @@ with pm.Model() as model:
     # define the likelihood
     y = pm.Bernoulli('y', p=theta[coin], observed=y)
 #   Generate a MCMC chain
-    trace = pm.sample(10000, step=pm.NUTS(), random_seed=(123), progressbar=False)
+    trace = pm.sample(5000, random_seed=123)
 
 ## Check the results.
-burnin = 100  # posterior samples to discard
 
 ## Print summary for each trace
-#pm.df_summary(trace[burnin:])
 #pm.df_summary(trace)
 
 ## Check for mixing and autocorrelation
-pm.autocorrplot(trace[burnin:], varnames=['mu', 'kappa'])
-#pm.autocorrplot(trace, vars =[mu, kappa])
+pm.autocorrplot(trace, varnames=['mu', 'kappa'])
 
 ## Plot KDE and sampled values for each parameter.
-pm.traceplot(trace[burnin:])
+pm.traceplot(trace)
 #pm.traceplot(trace)
 
 # Create arrays with the posterior sample
-theta1_sample = trace['theta'][:,0][burnin:]
-theta28_sample = trace['theta'][:,27][burnin:]
-mu_sample = trace['mu'][burnin:]
-kappa_sample = trace['kappa'][burnin:]
+theta1_sample = trace['theta'][:,0]
+theta28_sample = trace['theta'][:,27]
+mu_sample = trace['mu']
+kappa_sample = trace['kappa']
 
 # Plot mu histogram
 fig, ax = plt.subplots(2, 2, figsize=(12,12))

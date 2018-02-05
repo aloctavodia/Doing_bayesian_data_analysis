@@ -6,9 +6,8 @@ import numpy as np
 import pymc3 as pm
 import pandas as pd
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 from scipy.stats import norm
-from plot_post import plot_post
-import seaborn as sns  # optional
 from theano import tensor as tt
 
 
@@ -149,30 +148,25 @@ with pm.Model() as model:
     yl = pm.Normal('yl', mu=mu, tau=tau, observed=z)
 
     # Generate a MCMC chain
-    start = pm.find_MAP()
-    steps = pm.Metropolis()
-    trace = pm.sample(20000, steps, start=start, progressbar=False)
+    trace = pm.sample(2000)
 
 # EXAMINE THE RESULTS
-burnin = 2000
 
 # Print summary for each trace
-#pm.summary(trace[burnin:])
 #pm.summary(trace)
 
 # Check for mixing and autocorrelation
-#pm.autocorrplot(trace[burnin:], vars=model.unobserved_RVs[:-1])
+#pm.autocorrplot(trace, vars=model.unobserved_RVs[:-1])
 
 ## Plot KDE and sampled values for each parameter.
-pm.traceplot(trace[burnin:])
-#pm.traceplot(trace)
+pm.traceplot(trace)
 
 
 # Extract values of 'a'
-a0_sample = trace['a0'][burnin:]
-b1_sample = trace['b1'][burnin:]
-b2_sample = trace['b2'][burnin:]
-b1b2_sample = trace['b1b2'][burnin:]
+a0_sample = trace['a0']
+b1_sample = trace['b1']
+b2_sample = trace['b2']
+b1b2_sample = trace['b1b2']
 
 b0_sample = a0_sample * np.std(y) + np.mean(y)
 b1_sample = b1_sample * np.std(y)
@@ -180,34 +174,33 @@ b2_sample = b2_sample * np.std(y)
 b1b2_sample = b1b2_sample * np.std(y)
 
 
-
 plt.figure(figsize=(25,20))
-plt.subplot(451)
-plot_post(b0_sample, xlab=r'$\beta0$',
-              show_mode=False, framealpha=0.5,
-              bins=50, title='Baseline')
+ax = plt.subplot(451)
+pm.plot_posterior(b0_sample,  bins=50, ax=ax)
+ax.set_xlabel(r'$\beta0$')
+ax.set_title('Baseline')
 plt.xlim(b0_sample.min(), b0_sample.max());
 
 count = 2
 for i in range(len(b1_sample[0])):
-    plt.subplot(4, 5, count)
-    plot_post(b1_sample[:,i], xlab=r'$\beta1_{%s}$' % i,
-              show_mode=False, framealpha=0.5,
-              bins=50, title='x1: %s' % x1names[i])
+    ax = plt.subplot(4, 5, count)
+    pm.plot_posterior(b1_sample[:,i], ax=ax)
+    ax.set_xlabel(r'$\beta1_{}$'.format(i))
+    ax.set_title('x1: {}'.format(x1names[i]))
     count += 1
 
 for i in range(len(b2_sample[0])):
-    plt.subplot(4, 5, count)
-    plot_post(b2_sample[:,i], xlab=r'$\beta2_{%s}$' % i,
-              show_mode=False, framealpha=0.5,
-              bins=50, title='x1: %s' % x2names[i])    
+    ax = plt.subplot(4, 5, count)
+    pm.plot_posterior(b2_sample[:,i], bins=50, ax=ax)
+    ax.set_xlabel(r'$\beta2_{}$'.format(i)),
+    ax.set_title('x1: {}'.format(x2names[i]))
     count += 1
     
     for j in range(len(b1_sample[0])):
-        plt.subplot(4, 5, count)
-        plot_post(b1b2_sample[:,j,i], xlab=r'$\beta12_{%s%s}$' % (i, j),
-              show_mode=False, framealpha=0.5,
-              bins=50, title='x1: %s, x2: %s,' % (x1names[j], x2names[i]))
+        ax = plt.subplot(4, 5, count)
+        pm.plot_posterior(b1b2_sample[:,j,i], bins=50, ax=ax)
+        ax.set_title('x1: {}, x2: {}'.format(x1names[j], x2names[i]))
+        ax.set_xlabel(r'$\beta12_{}{}$'.format(i, j))
         count += 1
 
 
@@ -219,26 +212,23 @@ plt.figure(figsize=(10, 12))
 count = 1
 for key, value in x1contrastDict.items():
     contrast = np.dot(b1_sample, value)
-    plt.subplot(3, 2, count)
-    plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 
-                  show_mode=False, framealpha=0.5, 
-                  bins=50)
+    ax = plt.subplot(3, 2, count)
+    pm.plot_posterior(contrast, ref_val=0.0, bins=50, ax=ax)
+    ax.set_title('Contrast {}'.format(key))
     count += 1
     
 for key, value in x2contrastDict.items():
     contrast = np.dot(b2_sample, value)
-    plt.subplot(3, 2, count)
-    plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 
-                  show_mode=False, framealpha=0.5, 
-                  bins=50)
+    ax = plt.subplot(3, 2, count)
+    pm.plot_posterior(contrast, ref_val=0.0, bins=50, ax=ax)
+    ax.set_title('Contrast {}'.format(key))
     count += 1
     
 for key, value in x1x2contrastDict.items():
     contrast = np.tensordot(b1b2_sample, value)
-    plt.subplot(3, 2, count)
-    plot_post(contrast, title='Contrast %s' % key, comp_val=0.0, 
-                  show_mode=False, framealpha=0.5, 
-                  bins=50)
+    ax = plt.subplot(3, 2, count)
+    pm.plot_posterior(contrast, ref_val=0.0, bins=50, ax=ax)
+    ax.set_title('Contrast {}'.format(key))
     count += 1
 plt.tight_layout()
 plt.savefig('Figure_19.5.png')

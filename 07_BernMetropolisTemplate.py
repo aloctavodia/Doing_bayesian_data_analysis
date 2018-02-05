@@ -4,8 +4,10 @@ applied to a single parameter called theta, defined on the interval [0,1].
 """
 from __future__ import division
 import numpy as np
+import pymc3 as pm
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 from scipy.stats import beta
-from plot_post import *
 
 
 
@@ -70,7 +72,7 @@ trajectory = np.zeros(traj_length)
 # Specify where to start the trajectory:
 trajectory[0] = 0.50 # arbitrary value
 # Specify the burn-in period:
-burn_in = np.ceil(0.1 * traj_length) # arbitrary number, less than traj_length
+burn_in = int(np.ceil(0.1 * traj_length)) # arbitrary number, less than traj_length
 # Initialize accepted, rejected counters, just to monitor performance:
 n_accepted = 0
 n_rejected = 0
@@ -109,6 +111,10 @@ for t in range(traj_length-1):
 accepted_traj = trajectory[burn_in:]
 # End of Metropolis algorithm.
 
+# Display the posterior.
+ROPE = np.array([0.76, 0.8])
+pm.plot_posterior(accepted_traj,  ref_val=0.9, rope=ROPE)
+plt.xlabel = 'theta'
 
 
 # Display rejected/accepted ratio in the plot.
@@ -137,9 +143,6 @@ p_data = 1 / np.mean(wtd_evid)
 # Display p(D) in the graph
 plt.plot(0, label='p(D) = %.3e' % p_data, alpha=0)
 
-# Display the posterior.
-ROPE = np.array([0.76, 0.8])
-mcmc_info = plot_post(accepted_traj, xlab='theta', show_mode=False, comp_val=0.9, ROPE=ROPE)
 
 
 # Uncomment next line if you want to save the graph.

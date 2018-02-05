@@ -5,6 +5,7 @@ from __future__ import division
 import numpy as np
 import pymc3 as pm
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 
 # THE DATA.
 # For each subject, specify the condition s/he was in,
@@ -54,16 +55,14 @@ with pm.Model() as model:
     theta0 = pm.Beta('theta0', a_Beta0, b_Beta0, shape=n_subj)
     theta1 = pm.Beta('theta1', a_Beta1, b_Beta1, shape=n_subj)
     # if model_index == 0 then sample from theta1 else sample from theta0
-    theta = pm.switch(pm.eq(model_index, 0), theta1, theta0)
+    theta = pm.math.switch(pm.math.eq(model_index, 0), theta1, theta0)
 
     # Likelihood:
     y = pm.Binomial('y', p=theta, n=n_trl_of_subj, observed=n_corr_of_subj)
 
     # Sampling
-    step1 = pm.Metropolis([kappa0, kappa1, mu])
-    step2 = pm.NUTS([theta0, theta1])
-    step3 = pm.ElemwiseCategorical(vars=[model_index],values=[0,1])
-    trace = pm.sample(5000, step=[step1, step2, step3], progressbar=False)
+    step = pm.ElemwiseCategorical(vars=[model_index],values=[0,1])
+    trace = pm.sample(5000, step=step, progressbar=False)
 
 
 # EXAMINE THE RESULTS.
@@ -72,12 +71,12 @@ pm.traceplot(trace)
 
 model_idx_sample = trace['model_index'][burnin:]
 
-pM1 = sum(model_idx_sample == 1) / len(model_idx_sample)
+pM1 = sum(model_idx_sample == 0) / len(model_idx_sample)
 pM2 = 1 - pM1
 
 plt.figure(figsize=(15, 15))
 plt.subplot2grid((5,4), (0,0), colspan=4)
-plt.plot(model_idx_sample, label='p(M1|D) = %.3f ; p(M2|D) = %.3f' % (pM1, pM2));
+plt.plot(model_idx_sample, label='p(M1|D) = {:.3f} ; p(M2|D) = {:.3f}'.format(pM1, pM2));
 plt.xlabel('Steps in Markov Chain')
 plt.legend(loc='upper right', framealpha=0.75)
 
@@ -85,14 +84,14 @@ for m in range(0, 2):
     kappa0_sample = trace['kappa0'][burnin:][model_idx_sample == m]
     plt.subplot2grid((5,4), (3+m, 1), colspan=2)
     plt.hist(kappa0_sample, bins=30)
-    plt.title(r'Post. $\kappa_0$ for M=%s' % (m+1), fontsize=14)
+    plt.title(r'Post. $\kappa_0$ for M={}'.format(m+1), fontsize=14)
     plt.xlabel(r'$\kappa_0$')
     plt.xlim(0, 30)
     for i in range(0, 4):
         kappa1_sample = trace['kappa1'][:,i][burnin:][model_idx_sample == m]
         plt.subplot2grid((5,4), (m+1, i))
         plt.hist(kappa1_sample, bins=30)
-        plt.title(r'Post. $\kappa_%s$ for M=%s' % (i+1, m+1), fontsize=14)
+        plt.title(r'Post. $\kappa_{}$ for M={}'.format(i+1, m+1), fontsize=14)
         plt.xlabel(r'$\kappa_%s$' % (i+1))
         plt.xlim(0, 30)
 

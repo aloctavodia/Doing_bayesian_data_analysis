@@ -8,10 +8,9 @@ import pymc3 as pm
 from scipy.stats import norm
 from scipy.interpolate import spline
 import matplotlib.pyplot as plt
-from plot_post import plot_post
 from hpd import *
 from HtWtDataGenerator import *
-import seaborn as sns
+plt.style.use('seaborn-darkgrid')
 
 # THE DATA.
 # Simulated height and weight data:
@@ -33,39 +32,33 @@ zy = (y - y_m) / y_sd
 # THE MODEL
 with pm.Model() as model:
     # define the priors
-    tau = pm.Gamma('tau', 0.001, 0.001)
-    beta0 = pm.Normal('beta0', mu=0, tau=1.0E-12)
-    beta1 = pm.Normal('beta1', mu=0, tau=1.0E-12)
+    sd = pm.HalfNormal('sd', 25)
+    beta0 = pm.Normal('beta0', mu=0, sd=100)
+    beta1 = pm.Normal('beta1', mu=0, sd=100)
     mu = beta0 + beta1 * zx
     # define the likelihood
-    yl = pm.Normal('yl', mu=mu, tau=tau, observed=zy)
+    yl = pm.Normal('yl', mu=mu, sd=sd, observed=zy)
     # Generate a MCMC chain
-    start = pm.find_MAP()
-    step = pm.Metropolis()
-    trace = pm.sample(10000, step, start, progressbar=False)
+    trace = pm.sample(1000)
 
 
 # EXAMINE THE RESULTS
-burnin = 5000
-thin = 10
 
 ## Print summary for each trace
-#pm.summary(trace[burnin::thin])
 #pm.summary(trace)
 
 ## Check for mixing and autocorrelation
-#pm.autocorrplot(trace[burnin::thin], vars =[tau])
 #pm.autocorrplot(trace, vars =[tau])
 
+
 ## Plot KDE and sampled values for each parameter.
-pm.traceplot(trace[burnin::thin])
-#pm.traceplot(trace)
+pm.traceplot(trace)
+
 
 ## Extract chain values:
 z0 = trace['beta0']
 z1 = trace['beta1']
-z_tau = trace['tau']
-z_sigma = 1 / np.sqrt(z_tau) # Convert precision to SD
+z_sigma = trace['sd']
 
 
 # Convert to original scale:
@@ -108,12 +101,12 @@ plt.savefig('Figure_16.4.png')
 
 # Display the posterior of the b1:
 plt.figure(figsize=(8, 5))
-plt.subplot(1, 2, 1)
-plot_post(z1, xlab='Standardized slope', 
-          comp_val=0.0, bins=30, show_mode=False)
-plt.subplot(1, 2, 2)
-plot_post(b1, xlab='Slope (pounds per inch)', 
-          comp_val=0.0, bins=30, show_mode=False)
+ax = plt.subplot(1, 2, 1)
+pm.plot_posterior(z1, ref_val=0.0, bins=30, ax=ax)
+ax.set_xlabel('Standardized slope')
+ax = plt.subplot(1, 2, 2)
+pm.plot_posterior(b1, ref_val=0.0, bins=30, ax=ax)
+ax.set_xlabel('Slope (pounds per inch)')
 plt.tight_layout()
 plt.savefig('Figure_16.5.png')
 

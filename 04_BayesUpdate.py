@@ -2,8 +2,10 @@
 Bayesian updating of beliefs about the bias of a coin. The prior and posterior
 distributions indicate probability masses at discrete candidate values of theta.
 """
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
+
 
 
 # theta is the vector of candidate values for the parameter theta.

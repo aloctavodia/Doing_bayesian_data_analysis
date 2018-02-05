@@ -2,6 +2,7 @@
 Inferring a binomial proportion via grid aproximation.
 """
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 import numpy as np
 from hpd import hpd
 

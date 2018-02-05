@@ -6,7 +6,7 @@ import numpy as np
 import pymc3 as pm
 from scipy.stats import binom
 import matplotlib.pyplot as plt
-from plot_post import plot_post
+plt.style.use('seaborn-darkgrid')
 
 # THE DATA.
 # For each subject, specify the condition s/he was in,
@@ -49,51 +49,46 @@ with pm.Model() as model:
     theta0 = pm.Beta('theta0', a_Beta0, b_Beta0, shape=n_subj)
     theta1 = pm.Beta('theta1', a_Beta1, b_Beta1, shape=n_subj)
     # if model_index == 0 then sample from theta1 else sample from theta0
-    theta = pm.switch(pm.eq(model_index, 0), theta1, theta0)
+    theta = pm.math.switch(pm.math.eq(model_index, 0), theta1, theta0)
 
     # Likelihood:
     y = pm.Binomial('y', p=theta, n=n_trl_of_subj, observed=n_corr_of_subj)
 
     # Sampling
-    start = pm.find_MAP()
-    step1 = pm.Metropolis(model.vars[1:])
-    step2 = pm.ElemwiseCategoricalStep(var=model_index,values=[0,1])
-    trace = pm.sample(20000, [step1, step2], start=start, progressbar=False)
-
+    step = pm.ElemwiseCategorical(vars=[model_index],values=[0,1])
+    trace = pm.sample(10000, step)
 
 # EXAMINE THE RESULTS.
-burnin = 10000
-thin = 10
 
 ## Print summary for each trace
-#pm.summary(trace[burnin::thin])
 #pm.summary(trace)
 
 ## Check for mixing and autocorrelation
 #pm.autocorrplot(trace, vars =[mu, kappa])
 
 ## Plot KDE and sampled values for each parameter.
-#pm.traceplot(trace[burnin::thin])
 #pm.traceplot(trace)
 
-model_idx_sample = trace['model_index'][burnin::thin]
-pM1 = sum(model_idx_sample == 1) / len(model_idx_sample)
+model_idx_sample = trace['model_index']
+pM1 = sum(model_idx_sample == 0) / len(model_idx_sample)
 pM2 = 1 - pM1
 
 plt.figure(figsize=(15, 15))
 plt.subplot2grid((3,3), (0,0), colspan=3)
-plt.plot(model_idx_sample, label='p(DiffMu|D) = %.3f ; p(SameMu|D) = %.3f' % (pM1, pM2));
+plt.plot(model_idx_sample, label='p(DiffMu|D) = %.3f ; p(SameMu|D) = {:.3f}'.format(pM1, pM2));
 plt.xlabel('Step in Markov Chain')
 plt.legend(loc='upper right', framealpha=0.75)
 
 count = 0
 position = [(1,0), (1,1), (1,2), (2,0), (2,1), (2,2)]
 for i in range(0, 4):
-    mui_sample = trace['mu1'][:,i][burnin::thin][model_idx_sample == 0]
+    mui_sample = trace['mu1'][:,i][model_idx_sample == 0]
     for j in range(i+1, 4):
-        muj_sample = trace['mu1'][:,j][burnin::thin][model_idx_sample == 0]
-        plt.subplot2grid((3,3), position[count])
-        plot_post(mui_sample-muj_sample, xlab=r'$\mu_%s - \mu_%s$' % (i+1, j+1), show_mode=False, comp_val=0, framealpha=0.5)
+        muj_sample = trace['mu1'][:,j][model_idx_sample == 0]
+        ax = plt.subplot2grid((3,3), position[count])
+        pm.plot_posterior(mui_sample-muj_sample,
+                          ref_val=0, ax=ax)
+        plt.title(r'$\mu_{} - \mu_{}$'.format(i+1, j+1))
         plt.xlim(-0.3, 0.3)
         count += 1
 
@@ -101,4 +96,3 @@ for i in range(0, 4):
 plt.tight_layout()
 plt.savefig('Figure_12.5.png')
 plt.show()
-

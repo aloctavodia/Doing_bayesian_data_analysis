@@ -2,6 +2,7 @@
 Goal: Toss a coin N times and compute the running proportion of heads.
 """
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-darkgrid')
 import numpy as np
 
 # Specify the total number of flips, denoted N.
