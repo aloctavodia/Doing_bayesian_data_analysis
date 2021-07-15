@@ -1,5 +1,5 @@
 """
-Inferring a binomial proportion via grid aproximation.
+Inferring a binomial proportion via grid approximation.
 """
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-darkgrid')

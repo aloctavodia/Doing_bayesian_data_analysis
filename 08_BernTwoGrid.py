@@ -1,5 +1,5 @@
 """
-Inferring two binomial proportions via grid aproximation.
+Inferring two binomial proportions via grid approximation.
 """
 from __future__ import division
 import matplotlib.pyplot as plt
