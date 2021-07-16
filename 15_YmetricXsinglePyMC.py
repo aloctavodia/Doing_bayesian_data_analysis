@@ -20,7 +20,7 @@ y = norm.rvs(true_mu, true_std, 500)
 with pm.Model() as model:
     # define the priors
     sd = pm.HalfNormal('sd', 25)
-    mu = pm.Normal('mu', mu=0, sd=100) # PyMC support precission and std
+    mu = pm.Normal('mu', mu=0, sd=100) # PyMC support precision and std
     #define the likelihood
     yl = pm.Normal('yl', mu, sd, observed=y)
 #   Generate a MCMC chain

@@ -29,7 +29,7 @@ y_sd = np.std(y)
 zx = (x - x_m) / x_sd
 zy = (y - y_m) / y_sd
 
-tdf_gain = 1 # 1 for low-baised tdf, 100 for high-biased tdf
+tdf_gain = 1 # 1 for low-biased tdf, 100 for high-biased tdf
 
 # THE MODEL
 with pm.Model() as model:
